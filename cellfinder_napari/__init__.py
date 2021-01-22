@@ -3,8 +3,6 @@ try:
 except ImportError:
     __version__ = "unknown"
 
-# replace the asterisk with named imports
-from .cellfinder_napari import napari_get_reader
-
+from .cellfinder_napari import napari_experimental_provide_function_widget
 
 __all__ = ["napari_get_reader"]

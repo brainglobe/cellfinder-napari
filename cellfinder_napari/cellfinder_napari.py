@@ -1,79 +1,73 @@
 """
-This module is an example of a barebones numpy reader plugin for napari.
-
-It implements the ``napari_get_reader`` hook specification, (to create
-a reader plugin) but your plugin may choose to implement any of the hook
-specifications offered by napari.
-see: https://napari.org/docs/plugins/hook_specifications.html
-
-Replace code below accordingly.  For complete documentation see:
-https://napari.org/docs/plugins/for_plugin_developers.html
+This module is an example of a barebones function widget plugin for napari
+It implements the ``napari_experimental_provide_function_widget`` hook specification.
+see: https://napari.org/docs/dev/plugins/hook_specifications.html
+Replace code below according to your needs.
 """
+from typing import TYPE_CHECKING
+from magicgui import magicgui
+import enum
 import numpy as np
 from napari_plugin_engine import napari_hook_implementation
+from napari.types import ImageData, LayerDataTuple, PointsData
+from cellfinder_core.main import main as cellfinder_run
+
+import logging
+import os
+import yaml
+
+import pandas as pd
+
+from xml.dom import minidom
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element as EtElement
+
+from imlib.cells.cells import (
+    Cell,
+    UntypedCell,
+    pos_from_file_name,
+    MissingCellsError,
+)
+from imlib.general.system import replace_extension
+
+def cells_df_as_np(cells_df, new_order=[2, 1, 0], type_column="type"):
+    cells_df = cells_df.drop(columns=[type_column])
+    cells = cells_df[cells_df.columns[new_order]]
+    cells = cells.to_numpy()
+    return cells
 
 
 @napari_hook_implementation
-def napari_get_reader(path):
-    """A basic implementation of the napari_get_reader hook specification.
-
-    Parameters
-    ----------
-    path : str or list of str
-        Path to file, or list of paths.
-
-    Returns
-    -------
-    function or None
-        If the path is a recognized format, return a function that accepts the
-        same path or list of paths, and returns a list of layer data tuples.
-    """
-    if isinstance(path, list):
-        # reader plugins may be handed single path, or a list of paths.
-        # if it is a list, it is assumed to be an image stack...
-        # so we are only going to look at the first file.
-        path = path[0]
-
-    # if we know we cannot read the file, we immediately return None.
-    if not path.endswith(".npy"):
-        return None
-
-    # otherwise we return the *function* that can read ``path``.
-    return reader_function
+def napari_experimental_provide_function_widget():
+    return detect, {'call_button':'Run'}
 
 
-def reader_function(path):
-    """Take a path or list of paths and return a list of LayerData tuples.
+def detect(signal: ImageData,  background: ImageData,
+           start_plane: int = 600, end_plane: int = 650,
+           z_voxel: float=5, y_voxel: float = 2,
+           x_voxel: float = 2) -> LayerDataTuple:
 
-    Readers are expected to return data as a list of tuples, where each tuple
-    is (data, [add_kwargs, [layer_type]]), "add_kwargs" and "layer_type" are
-    both optional.
+    voxel_sizes = (z_voxel, y_voxel, x_voxel)
 
-    Parameters
-    ----------
-    path : str or list of str
-        Path to file, or list of paths.
+    points = cellfinder_run(
+        signal,
+        background,
+        voxel_sizes,
+        start_plane=start_plane,
+        end_plane=end_plane,
+        n_free_cpus=6
+    )
+    df = pd.DataFrame([c.to_dict() for c in points])
+    cells = df[df["type"] == Cell.CELL]
 
-    Returns
-    -------
-    layer_data : list of tuples
-        A list of LayerData tuples where each tuple in the list contains
-        (data, metadata, layer_type), where data is a numpy array, metadata is
-        a dict of keyword arguments for the corresponding viewer.add_* method
-        in napari, and layer_type is a lower-case string naming the type of layer.
-        Both "meta", and "layer_type" are optional. napari will default to
-        layer_type=="image" if not provided
-    """
-    # handle both a string and a list of strings
-    paths = [path] if isinstance(path, str) else path
-    # load all files into array
-    arrays = [np.load(_path) for _path in paths]
-    # stack arrays into single array
-    data = np.squeeze(np.stack(arrays))
+    points = cells_df_as_np(cells)
 
-    # optional kwargs for the corresponding viewer.add_* method
-    # https://napari.org/docs/api/napari.components.html#module-napari.components.add_layers_mixin
-    add_kwargs = {}
-
-    layer_type = "image"  # optional, default is "image"
-    return [(data, add_kwargs, layer_type)]
+    properties = {
+        "name": "Points",
+        "size": 15,
+        "n_dimensional": True,
+        "opacity": 0.6,
+        "symbol": "ring",
+        "face_color": "lightgoldenrodyellow",
+    }
+    return points, properties, "points"
