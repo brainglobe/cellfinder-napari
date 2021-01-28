@@ -11,7 +11,12 @@ def read(fname):
     return codecs.open(file_path, encoding="utf-8").read()
 
 
-requirements = ["napari", "napari-plugin-engine >= 0.1.4", "numpy", "cellfinder-core"]
+requirements = [
+    "napari",
+    "napari-plugin-engine >= 0.1.4",
+    "numpy",
+    "cellfinder-core",
+]
 
 # https://github.com/pypa/setuptools_scm
 use_scm = {"write_to": "cellfinder_napari/_version.py"}

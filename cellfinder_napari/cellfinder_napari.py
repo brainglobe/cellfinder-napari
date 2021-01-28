@@ -24,8 +24,8 @@ def cells_df_as_np(cells_df, new_order=[2, 1, 0], type_column="type"):
 
 
 @napari_hook_implementation
-def napari_experimental_provide_function_widget():
-    return detect, {"call_button": "Run"}
+def napari_experimental_provide_function():
+    return detect  # , {"call_button": "Run"}
 
 
 def detect(
