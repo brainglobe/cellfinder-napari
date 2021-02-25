@@ -1,64 +1,74 @@
-"""
-This module is an example of a barebones function widget plugin for napari
-It implements the ``napari_experimental_provide_function_widget`` hook
-specification.
-see: https://napari.org/docs/dev/plugins/hook_specifications.html
-Replace code below according to your needs.
-"""
 from napari_plugin_engine import napari_hook_implementation
-from napari.types import ImageData, LayerDataTuple
 from cellfinder_core.main import main as cellfinder_run
 
+from magicgui import magicgui
 
-import pandas as pd
-
-
-from imlib.cells.cells import Cell
+from .utils import cells_to_array
 
 
-def cells_df_as_np(cells_df, new_order=[2, 1, 0], type_column="type"):
-    cells_df = cells_df.drop(columns=[type_column])
-    cells = cells_df[cells_df.columns[new_order]]
-    cells = cells.to_numpy()
-    return cells
+def widget_wrapper():
+    @magicgui(
+        signal=dict(label="Signal image"),
+        background=dict(label="Background image"),
+        voxel_size_z=dict(
+            widget_type="FloatSpinBox",
+            label="Voxel size (z)",
+            min=0.0,
+            max=100.0,
+            step=0.1,
+            value=5.0,
+        ),
+        voxel_size_y=dict(
+            widget_type="FloatSpinBox",
+            label="Voxel size (z)",
+            min=0.0,
+            max=100.0,
+            step=0.1,
+            value=2.0,
+        ),
+        voxel_size_x=dict(
+            widget_type="FloatSpinBox",
+            label="Voxel size (z)",
+            min=0.0,
+            max=100.0,
+            step=0.1,
+            value=2.0,
+        ),
+        call_button=True,
+    )
+    def widget(
+        signal: "napari.layers.Image",
+        background: "napari.layers.Image",
+        voxel_size_z: float,
+        voxel_size_y: float,
+        voxel_size_x: float,
+    ) -> "napari.types.LayerDataTuple":
+
+        voxel_sizes = (voxel_size_z, voxel_size_y, voxel_size_x)
+        points = cellfinder_run(
+            signal.data,
+            background.data,
+            voxel_sizes,
+            start_plane=0,
+            end_plane=-1,
+            n_free_cpus=2,
+        )
+
+        points = cells_to_array(points)
+
+        properties = {
+            "name": "Points",
+            "size": 15,
+            "n_dimensional": True,
+            "opacity": 0.6,
+            "symbol": "ring",
+            "face_color": "lightgoldenrodyellow",
+        }
+        return points, properties, "points"
+
+    return widget
 
 
 @napari_hook_implementation
-def napari_experimental_provide_function():
-    return detect  # , {"call_button": "Run"}
-
-
-def detect(
-    signal: ImageData,
-    background: ImageData,
-    start_plane: int = 600,
-    end_plane: int = 650,
-    z_voxel: float = 5,
-    y_voxel: float = 2,
-    x_voxel: float = 2,
-) -> LayerDataTuple:
-
-    voxel_sizes = (z_voxel, y_voxel, x_voxel)
-
-    points = cellfinder_run(
-        signal,
-        background,
-        voxel_sizes,
-        start_plane=start_plane,
-        end_plane=end_plane,
-        n_free_cpus=6,
-    )
-    df = pd.DataFrame([c.to_dict() for c in points])
-    cells = df[df["type"] == Cell.CELL]
-
-    points = cells_df_as_np(cells)
-
-    properties = {
-        "name": "Points",
-        "size": 15,
-        "n_dimensional": True,
-        "opacity": 0.6,
-        "symbol": "ring",
-        "face_color": "lightgoldenrodyellow",
-    }
-    return points, properties, "points"
+def napari_experimental_provide_dock_widget():
+    return widget_wrapper, {"name": "cellfinder"}
