@@ -1,10 +1,17 @@
 import napari
+from pathlib import Path
+
 from magicgui import magic_factory
 from napari_plugin_engine import napari_hook_implementation
+
+# from napari.qt.threading import thread_worker
 
 from cellfinder_core.main import main as cellfinder_run
 
 from .utils import cells_to_array
+
+# TODO:
+# how to store & fetch pre-trained models?
 
 
 @magic_factory(
@@ -37,6 +44,7 @@ def cellfinder(
     Start_plane: int = 0,
     End_plane: int = 0,
     Classification_batch_size: int = 32,
+    Trained_model: str = "",
     Number_of_free_cpus: int = 2,
 ) -> napari.types.LayerDataTuple:
 
@@ -44,22 +52,26 @@ def cellfinder(
         End_plane = len(Signal_image.data)
 
     voxel_sizes = (voxel_size_z, voxel_size_y, voxel_size_x)
-    points = cellfinder_run(
+    if Trained_model == "":
+        Trained_model = None
+
+    points = run(
         Signal_image.data,
         Background_image.data,
         voxel_sizes,
-        soma_diameter=Soma_diameter,
-        ball_xy_size=ball_xy_size,
-        ball_z_size=ball_z_size,
-        start_plane=Start_plane,
-        end_plane=End_plane,
-        ball_overlap_fraction=Ball_overlap,
-        log_sigma_size=Filter_width,
-        n_sds_above_mean_thresh=Threshold,
-        soma_spread_factor=Cell_spread,
-        max_cluster_size=Max_cluster,
-        n_free_cpus=Number_of_free_cpus,
-        batch_size=Classification_batch_size,
+        Soma_diameter,
+        ball_xy_size,
+        ball_z_size,
+        Start_plane,
+        End_plane,
+        Ball_overlap,
+        Filter_width,
+        Threshold,
+        Cell_spread,
+        Max_cluster,
+        Trained_model,
+        Number_of_free_cpus,
+        Classification_batch_size,
     )
 
     points = cells_to_array(points)
@@ -73,6 +85,47 @@ def cellfinder(
         "face_color": "lightgoldenrodyellow",
     }
     return points, properties, "points"
+
+
+# @thread_worker
+def run(
+    signal,
+    background,
+    voxel_sizes,
+    Soma_diameter,
+    ball_xy_size,
+    ball_z_size,
+    Start_plane,
+    End_plane,
+    Ball_overlap,
+    Filter_width,
+    Threshold,
+    Cell_spread,
+    Max_cluster,
+    Trained_model,
+    Number_of_free_cpus,
+    Classification_batch_size,
+):
+
+    points = cellfinder_run(
+        signal,
+        background,
+        voxel_sizes,
+        soma_diameter=Soma_diameter,
+        ball_xy_size=ball_xy_size,
+        ball_z_size=ball_z_size,
+        start_plane=Start_plane,
+        end_plane=End_plane,
+        ball_overlap_fraction=Ball_overlap,
+        log_sigma_size=Filter_width,
+        n_sds_above_mean_thresh=Threshold,
+        soma_spread_factor=Cell_spread,
+        max_cluster_size=Max_cluster,
+        trained_model=Trained_model,
+        n_free_cpus=Number_of_free_cpus,
+        batch_size=Classification_batch_size,
+    )
+    return points
 
 
 @napari_hook_implementation
