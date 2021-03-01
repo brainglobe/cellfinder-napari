@@ -26,6 +26,7 @@ from .utils import cells_to_array
     Cell_spread=dict(step=0.1),
     Classification_batch_size=dict(max=4096),
     call_button=True,
+    persist=True,
 )
 def cellfinder(
     Signal_image: "napari.layers.Image",
