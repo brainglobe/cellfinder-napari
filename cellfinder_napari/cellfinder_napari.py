@@ -26,11 +26,11 @@ from .utils import cells_to_array
     Cell_spread=dict(step=0.1),
     Classification_batch_size=dict(max=4096),
     call_button=True,
-    persist=True,
+    # persist=True,
 )
 def cellfinder(
-    Signal_image: "napari.layers.Image",
-    Background_image: "napari.layers.Image",
+    Signal_image: napari.layers.Image,
+    Background_image: napari.layers.Image,
     voxel_size_z: float = 5,
     voxel_size_y: float = 2,
     voxel_size_x: float = 2,
@@ -48,6 +48,18 @@ def cellfinder(
     Trained_model: str = "",
     Number_of_free_cpus: int = 2,
 ) -> napari.types.LayerDataTuple:
+    """
+
+    Parameters
+    ----------
+    voxel_size_z : float
+        Size of your voxels in the axial dimension
+    voxel_size_y : float
+        Size of your voxels in x (left to right)
+    voxel_size_z : float
+        Size of your voxels in the y (top to bottom)
+    """
+
 
     if End_plane == 0:
         End_plane = len(Signal_image.data)
