@@ -7,7 +7,6 @@ from napari_plugin_engine import napari_hook_implementation
 # from napari.qt.threading import thread_worker
 
 from cellfinder_core.main import main as cellfinder_run
-
 from .utils import cells_to_array
 
 # TODO:
@@ -52,7 +51,7 @@ def cellfinder(
     Max_cluster: int = 100000,
     classification_section=None,
     Classification_batch_size: int = 32,
-    Trained_model: str = "",
+    Trained_model: Path = Path.home(),
     misc_section=None,
     Start_plane: int = 0,
     End_plane: int = 0,
@@ -74,7 +73,7 @@ def cellfinder(
         End_plane = len(Signal_image.data)
 
     voxel_sizes = (voxel_size_z, voxel_size_y, voxel_size_x)
-    if Trained_model == "":
+    if Trained_model == Path.home():
         Trained_model = None
 
     points = run(
