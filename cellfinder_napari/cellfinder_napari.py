@@ -15,25 +15,33 @@ from .utils import cells_to_array
 
 
 @magic_factory(
+    header=dict(widget_type="Label", label="<h1>cellfinder</h1>"),
+    data_section=dict(widget_type="Label", label="<h3>Data:</h3>"),
     voxel_size_z=dict(label="Voxel size (z)", step=0.1),
     voxel_size_y=dict(label="Voxel size (y)", step=0.1),
     voxel_size_x=dict(label="Voxel size (x)", step=0.1),
+    performance_section=dict(widget_type="Label", label="<h3>Detection:</h3>"),
     ball_xy_size=dict(label="Ball filter (xy)"),
     ball_z_size=dict(label="Ball filter (z)"),
     Soma_diameter=dict(step=0.1),
     Ball_overlap=dict(step=0.1),
     Filter_width=dict(step=0.1),
     Cell_spread=dict(step=0.1),
+    classification_section=dict(widget_type="Label", label="<h3>Classification:</h3>"),
     Classification_batch_size=dict(max=4096),
+    misc_section=dict(widget_type="Label", label="<h3>Misc:</h3>"),
     call_button=True,
     # persist=True,
 )
 def cellfinder(
+    header,
+    data_section,
     Signal_image: napari.layers.Image,
     Background_image: napari.layers.Image,
     voxel_size_z: float = 5,
     voxel_size_y: float = 2,
     voxel_size_x: float = 2,
+    performance_section=None,
     Soma_diameter: float = 16.0,
     ball_xy_size: int = 6,
     ball_z_size: int = 15,
@@ -42,10 +50,12 @@ def cellfinder(
     Threshold: int = 10,
     Cell_spread: float = 1.4,
     Max_cluster: int = 100000,
-    Start_plane: int = 0,
-    End_plane: int = 0,
+    classification_section=None,
     Classification_batch_size: int = 32,
     Trained_model: str = "",
+    misc_section=None,
+    Start_plane: int = 0,
+    End_plane: int = 0,
     Number_of_free_cpus: int = 2,
 ) -> napari.types.LayerDataTuple:
     """
@@ -59,7 +69,6 @@ def cellfinder(
     voxel_size_z : float
         Size of your voxels in the y (top to bottom)
     """
-
 
     if End_plane == 0:
         End_plane = len(Signal_image.data)
