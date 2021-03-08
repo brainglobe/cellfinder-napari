@@ -120,7 +120,7 @@ def cellfinder(
     rejected_properties["face_color"] = "lightskyblue"
     rejected_properties["name"] = "Rejected"
 
-    # rejected_properties["visible"] = False
+    rejected_properties["visible"] = False
 
     return [
         (rejected, rejected_properties, "points"),
