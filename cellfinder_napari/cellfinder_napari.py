@@ -29,8 +29,7 @@ from .utils import cells_to_array
     Cell_spread=dict(step=0.1),
     Start_plane=dict(min=0, max=100000),
     End_plane=dict(min=0, max=100000),
-    classification_section=dict(widget_type="Label",
-                                label="<h3>Classification:</h3>"),
+    classification_section=dict(widget_type="Label", label="<h3>Classification:</h3>"),
     # Classification_batch_size=dict(max=4096),
     misc_section=dict(widget_type="Label", label="<h3>Misc:</h3>"),
     call_button=True,
@@ -77,6 +76,22 @@ def cellfinder(
         Elliptical morphological in-plane filter size (microns)
     ball_z_size : float
         Elliptical morphological axial filter size (microns)
+    Start_plane : int
+        First plane to process (to process a subset of the data)
+    End_plane : int
+        Last plane to process (to process a subset of the data)
+    Ball_overlap : float
+        Fraction of the morphological filter needed to be filled to retain a voxel
+    Filter_width : float
+        Laplacian of Gaussian filter width (as a fraction of soma diameter)
+    Threshold : int
+        Cell intensity threshold (as a multiple of noise above the mean)
+    Cell_spread : float
+        Cell spread factor (for splitting up cell clusters)
+    Max_cluster : int
+        Largest putative cell cluster (in cubic um) where splitting should be attempted
+    Number_of_free_cpus : int
+        How many CPU cores to leave free
     """
 
     if End_plane == 0:
