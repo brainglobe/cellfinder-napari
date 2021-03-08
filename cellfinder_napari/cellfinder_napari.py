@@ -3,9 +3,10 @@ from pathlib import Path
 
 from magicgui import magic_factory
 from napari_plugin_engine import napari_hook_implementation
+from typing import List
 
 # from napari.qt.threading import thread_worker
-
+from copy import deepcopy
 from cellfinder_core.main import main as cellfinder_run
 from .utils import cells_to_array
 
@@ -26,8 +27,11 @@ from .utils import cells_to_array
     Ball_overlap=dict(step=0.1),
     Filter_width=dict(step=0.1),
     Cell_spread=dict(step=0.1),
-    classification_section=dict(widget_type="Label", label="<h3>Classification:</h3>"),
-    Classification_batch_size=dict(max=4096),
+    Start_plane=dict(min=0, max=100000),
+    End_plane=dict(min=0, max=100000),
+    classification_section=dict(widget_type="Label",
+                                label="<h3>Classification:</h3>"),
+    # Classification_batch_size=dict(max=4096),
     misc_section=dict(widget_type="Label", label="<h3>Misc:</h3>"),
     call_button=True,
     # persist=True,
@@ -42,21 +46,21 @@ def cellfinder(
     voxel_size_x: float = 2,
     performance_section=None,
     Soma_diameter: float = 16.0,
-    ball_xy_size: int = 6,
-    ball_z_size: int = 15,
+    ball_xy_size: float = 6,
+    ball_z_size: float = 15,
     Ball_overlap: float = 0.6,
     Filter_width: float = 0.2,
     Threshold: int = 10,
     Cell_spread: float = 1.4,
     Max_cluster: int = 100000,
     classification_section=None,
-    Classification_batch_size: int = 32,
+    # Classification_batch_size: int = 2048,
     Trained_model: Path = Path.home(),
     misc_section=None,
     Start_plane: int = 0,
     End_plane: int = 0,
     Number_of_free_cpus: int = 2,
-) -> napari.types.LayerDataTuple:
+) -> List[napari.types.LayerDataTuple]:
     """
 
     Parameters
@@ -67,6 +71,12 @@ def cellfinder(
         Size of your voxels in x (left to right)
     voxel_size_z : float
         Size of your voxels in the y (top to bottom)
+    Soma_diameter : float
+        The expected in-plane soma diameter (microns)
+    ball_xy_size : float
+        Elliptical morphological in-plane filter size (microns)
+    ball_z_size : float
+        Elliptical morphological axial filter size (microns)
     """
 
     if End_plane == 0:
@@ -92,20 +102,30 @@ def cellfinder(
         Max_cluster,
         Trained_model,
         Number_of_free_cpus,
-        Classification_batch_size,
+        # Classification_batch_size,
     )
 
-    points = cells_to_array(points)
+    points, rejected = cells_to_array(points)
 
-    properties = {
-        "name": "Points",
+    points_properties = {
+        "name": "Detected",
         "size": 15,
         "n_dimensional": True,
         "opacity": 0.6,
         "symbol": "ring",
         "face_color": "lightgoldenrodyellow",
+        "visible": True,
     }
-    return points, properties, "points"
+    rejected_properties = deepcopy(points_properties)
+    rejected_properties["face_color"] = "lightskyblue"
+    rejected_properties["name"] = "Rejected"
+
+    # rejected_properties["visible"] = False
+
+    return [
+        (rejected, rejected_properties, "points"),
+        (points, points_properties, "points"),
+    ]
 
 
 # @thread_worker
@@ -125,7 +145,7 @@ def run(
     Max_cluster,
     Trained_model,
     Number_of_free_cpus,
-    Classification_batch_size,
+    # Classification_batch_size,
 ):
 
     points = cellfinder_run(
@@ -144,7 +164,7 @@ def run(
         max_cluster_size=Max_cluster,
         trained_model=Trained_model,
         n_free_cpus=Number_of_free_cpus,
-        batch_size=Classification_batch_size,
+        # batch_size=Classification_batch_size,
     )
     return points
 

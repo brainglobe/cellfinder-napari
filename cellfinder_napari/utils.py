@@ -11,6 +11,6 @@ def cells_df_as_np(cells_df, new_order=[2, 1, 0], type_column="type"):
 
 def cells_to_array(cells):
     df = pd.DataFrame([c.to_dict() for c in cells])
-    cells = df[df["type"] == Cell.CELL]
-    points = cells_df_as_np(cells)
-    return points
+    points = cells_df_as_np(df[df["type"] == Cell.CELL])
+    rejected = cells_df_as_np(df[df["type"] == Cell.UNKNOWN])
+    return points, rejected

@@ -14,11 +14,10 @@ def read(fname):
 requirements = [
     "napari",
     "napari-plugin-engine >= 0.1.4",
-    "numpy",
+    "napari-ndtiffs",
     "cellfinder-core",
 ]
 
-# https://github.com/pypa/setuptools_scm
 use_scm = {"write_to": "cellfinder_napari/_version.py"}
 
 setup(
