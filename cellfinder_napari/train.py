@@ -1,6 +1,5 @@
 from pathlib import Path
 from magicgui import magic_factory
-from napari_plugin_engine import napari_hook_implementation
 from cellfinder_core.train.train_yml import run as run_training
 
 # TODO:
@@ -44,8 +43,3 @@ def train(
         learning_rate=Learning_rate,
         batch_size=Batch_size,
     )
-
-
-@napari_hook_implementation
-def napari_experimental_provide_dock_widget():
-    return train, {"name": "Train network"}

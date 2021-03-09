@@ -46,10 +46,5 @@ setup(
         "Operating System :: OS Independent",
         "License :: OSI Approved :: BSD License",
     ],
-    entry_points={
-        "napari.plugin": [
-            "cellfinder_train = cellfinder_napari.train",
-            "cellfinder = cellfinder_napari.detect",
-        ],
-    },
+    entry_points={"napari.plugin": ["cellfinder = cellfinder_napari.plugins"]},
 )

@@ -2,7 +2,6 @@ import napari
 from pathlib import Path
 
 from magicgui import magic_factory, widgets
-from napari_plugin_engine import napari_hook_implementation
 from typing import List
 
 # from napari.qt.threading import thread_worker
@@ -13,12 +12,14 @@ from .utils import cells_to_array
 # TODO:
 # how to store & fetch pre-trained models?
 
+
 def init(widget):
     widget.insert(0, widgets.Label(value="<h1>cellfinder</h1>"))
     widget.insert(1, widgets.Label(value="<h3>Data:</h3>"))
     widget.insert(7, widgets.Label(value="<h3>Detection:</h3>"))
     widget.insert(16, widgets.Label(value="<h3>Classification:</h3>"))
     widget.insert(18, widgets.Label(value="<h3>Misc:</h3>"))
+
 
 @magic_factory(
     voxel_size_z=dict(label="Voxel size (z)", step=0.1),
@@ -37,7 +38,7 @@ def init(widget):
     widget_init=init
     # persist=True,
 )
-def cellfinder(
+def detect(
     Signal_image: napari.layers.Image,
     Background_image: napari.layers.Image,
     voxel_size_z: float = 5,
@@ -178,13 +179,3 @@ def run(
         # batch_size=Classification_batch_size,
     )
     return points
-
-
-@napari_hook_implementation
-def napari_experimental_provide_dock_widget():
-    return cellfinder, {"name": "Cell detection"}
-
-
-
-
-
