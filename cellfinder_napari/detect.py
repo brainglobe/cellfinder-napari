@@ -1,7 +1,7 @@
 import napari
 from pathlib import Path
 
-from magicgui import magic_factory
+from magicgui import magic_factory, widgets
 from napari_plugin_engine import napari_hook_implementation
 from typing import List
 
@@ -13,14 +13,17 @@ from .utils import cells_to_array
 # TODO:
 # how to store & fetch pre-trained models?
 
+def init(widget):
+    widget.insert(0, widgets.Label(value="<h1>cellfinder</h1>"))
+    widget.insert(1, widgets.Label(value="<h3>Data:</h3>"))
+    widget.insert(7, widgets.Label(value="<h3>Detection:</h3>"))
+    widget.insert(16, widgets.Label(value="<h3>Classification:</h3>"))
+    widget.insert(18, widgets.Label(value="<h3>Misc:</h3>"))
 
 @magic_factory(
-    header=dict(widget_type="Label", label="<h1>cellfinder</h1>"),
-    data_section=dict(widget_type="Label", label="<h3>Data:</h3>"),
     voxel_size_z=dict(label="Voxel size (z)", step=0.1),
     voxel_size_y=dict(label="Voxel size (y)", step=0.1),
     voxel_size_x=dict(label="Voxel size (x)", step=0.1),
-    performance_section=dict(widget_type="Label", label="<h3>Detection:</h3>"),
     ball_xy_size=dict(label="Ball filter (xy)"),
     ball_z_size=dict(label="Ball filter (z)"),
     Soma_diameter=dict(step=0.1),
@@ -29,21 +32,17 @@ from .utils import cells_to_array
     Cell_spread=dict(step=0.1),
     Start_plane=dict(min=0, max=100000),
     End_plane=dict(min=0, max=100000),
-    classification_section=dict(widget_type="Label", label="<h3>Classification:</h3>"),
     # Classification_batch_size=dict(max=4096),
-    misc_section=dict(widget_type="Label", label="<h3>Misc:</h3>"),
     call_button=True,
+    widget_init=init
     # persist=True,
 )
 def cellfinder(
-    header,
-    data_section,
     Signal_image: napari.layers.Image,
     Background_image: napari.layers.Image,
     voxel_size_z: float = 5,
     voxel_size_y: float = 2,
     voxel_size_x: float = 2,
-    performance_section=None,
     Soma_diameter: float = 16.0,
     ball_xy_size: float = 6,
     ball_z_size: float = 15,
@@ -52,10 +51,7 @@ def cellfinder(
     Threshold: int = 10,
     Cell_spread: float = 1.4,
     Max_cluster: int = 100000,
-    classification_section=None,
-    # Classification_batch_size: int = 2048,
     Trained_model: Path = Path.home(),
-    misc_section=None,
     Start_plane: int = 0,
     End_plane: int = 0,
     Number_of_free_cpus: int = 2,
@@ -187,3 +183,8 @@ def run(
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
     return cellfinder, {"name": "Cell detection"}
+
+
+
+
+
