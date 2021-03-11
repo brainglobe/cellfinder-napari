@@ -1,46 +1,74 @@
 from pathlib import Path
-from magicgui import magic_factory
-from cellfinder_core.train.train_yml import run as run_training
+from magicgui import magic_factory, widgets
+from cellfinder_core.train.train_yml import run as train_yml
+from cellfinder_core.download.models import model_weight_urls
+from cellfinder_core.train.train_yml import models
 
-# TODO:
-# how to store & fetch pre-trained models?
-# how to support N yaml files
+MODELS = list(models.keys())
+PRETRAINED_MODELS = list(model_weight_urls.keys())
 
-"""A LineEdit widget with a button that opens a FileDialog.
 
-Parameters
-----------
-mode : FileDialogMode or str
-    - ``'r'`` returns one existing file.
-    - ``'rm'`` return one or more existing files.
-    - ``'w'`` return one file name that does not have to exist.
-    - ``'d'`` returns one existing directory.
-filter : str, optional
-    The filter is used to specify the kind of files that should be shown.
-    It should be a glob-style string, like ``'*.png'`` (this may be
-    backend-specific)
-"""
+def init(widget):
+    widget.insert(0, widgets.Label(value="<h2>cellfinder</h2>"))
+    widget.insert(1, widgets.Label(value="<h3>Network training</h3>"))
+    widget.insert(2, widgets.Label(value="<b>Training data:</b>"))
+    widget.insert(5, widgets.Label(value="<b>Network (optional):</b>"))
+    widget.insert(10, widgets.Label(value="<b>Training (optional):</b>"))
+    widget.insert(21, widgets.Label(value="<b>Misc (optional):</b>"))
 
 
 @magic_factory(
-    YAML_file=dict(mode="rm", filter="*.yml"),
+    YAML_files=dict(mode="rm", filter="*.yml"),
     Output_directory=dict(mode="d"),
+    Test_fraction=dict(step=0.05, min=0.0, max=0.95),
+    Pretrained_model=dict(choices=PRETRAINED_MODELS),
+    Model_depth=dict(choices=MODELS),
     call_button=True,
+    widget_init=init,
 )
 def train(
-    YAML_file: Path = Path.home(),
+    YAML_files: Path = Path.home(),
     Output_directory: Path = Path.home(),
+    Trained_model: Path = Path.home(),
+    Model_weights: Path = Path.home(),
+    Model_depth: str = "50",
+    Pretrained_model: str = PRETRAINED_MODELS[0],
+    Continue_training: bool = False,
+    Augment: bool = True,
+    Tensorboard: bool = False,
+    Save_weights: bool = False,
+    Save_checkpoints: bool = True,
+    Save_progress: bool = True,
     Epochs: int = 100,
     Learning_rate: float = 0.0001,
     Batch_size: int = 16,
+    Test_fraction: float = 0.1,
     Number_of_free_cpus: int = 2,
 ):
+    if Trained_model == Path.home():
+        Trained_model = None
+    if Model_weights == Path.home():
+        Model_weights = None
 
-    run_training(
-        Output_directory,
-        YAML_file,
-        n_free_cpus=Number_of_free_cpus,
-        epochs=Epochs,
-        learning_rate=Learning_rate,
-        batch_size=Batch_size,
-    )
+    if YAML_files[0] == Path.home():
+        print("Please select a YAML file for training")
+    else:
+        train_yml(
+            Output_directory,
+            YAML_files,
+            network_depth=Model_depth,
+            model=Pretrained_model,
+            trained_model=Trained_model,
+            model_weights=Model_weights,
+            no_augment=not (Augment),
+            tensorboard=Tensorboard,
+            save_weights=Save_weights,
+            save_progress=Save_progress,
+            no_save_checkpoints=not (Save_checkpoints),
+            n_free_cpus=Number_of_free_cpus,
+            continue_training=Continue_training,
+            test_fraction=Test_fraction,
+            epochs=Epochs,
+            learning_rate=Learning_rate,
+            batch_size=Batch_size,
+        )
