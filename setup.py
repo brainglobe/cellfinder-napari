@@ -1,15 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import os
-import codecs
 from setuptools import setup, find_packages
+from os import path
 
-
-def read(fname):
-    file_path = os.path.join(os.path.dirname(__file__), fname)
-    return codecs.open(file_path, encoding="utf-8").read()
-
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
+    long_description = f.read()
 
 requirements = [
     "napari",
@@ -18,22 +12,36 @@ requirements = [
     "cellfinder-core",
 ]
 
-use_scm = {"write_to": "cellfinder_napari/_version.py"}
-
 setup(
     name="cellfinder-napari",
+    version="0.0.2",
     author="Adam Tyson",
     author_email="adam.tyson@ucl.ac.uk",
-    license="BSD-3",
-    url="https://github.com/brainglobe/cellfinder-napari",
+    license="GPL-3.0",
     description="Efficient cell detection in large images",
-    long_description=read("README.md"),
+    long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
     python_requires=">=3.6",
     install_requires=requirements,
-    use_scm_version=use_scm,
-    setup_requires=["setuptools_scm"],
+    extras_require={
+        "dev": [
+            "black",
+            "pytest-cov",
+            "pytest",
+            "gitpython",
+            "coverage>=5.0.3",
+            "bump2version",
+            "pre-commit",
+            "flake8",
+        ]
+    },
+    url="https://cellfinder.info",
+    project_urls={
+        "Source Code": "https://github.com/brainglobe/cellfinder-napari",
+        "Bug Tracker": "https://github.com/brainglobe/cellfinder/issues-napari",
+        "Documentation": "https://docs.brainglobe.info/cellfinder",
+    },
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
