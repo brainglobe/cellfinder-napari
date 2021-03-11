@@ -45,6 +45,52 @@ def train(
     Test_fraction: float = 0.1,
     Number_of_free_cpus: int = 2,
 ):
+    """
+
+    Parameters
+    ----------
+    YAML_files : Path
+        YAML files containing paths to training data
+    Output_directory : Path
+        Directory to save the output trained model
+    Trained_model : Path
+        Existing pre-trained model
+    Model_weights : Path
+        Existing pre-trained model weights
+        Should be set along with "Model depth"
+    Model_depth : str
+        ResNet model depth (as per He et al. (2015)
+    Pretrained_model : str
+        Which pre-trained model to use
+        (Supplied with cellfinder)
+    Continue_training : bool
+        Continue training from an existing trained model
+        If no trained model or model weights are specified,
+        this will continue from the pretrained model
+    Augment : bool
+        Augment the training data to improve generalisation
+    Tensorboard : bool
+        Log to output_directory/tensorboard
+    Save_weights : bool
+        Only store the model weights, and not the full model
+        Useful to save storage space
+    Save_checkpoints : bool
+        Store the model at intermediate points during training
+    Save_progress : bool
+        Save training progress to a .csv file
+    Epochs : int
+        Number of training epochs
+        (How many times to use each training data point)
+    Learning_rate : float
+        Learning rate for training the model
+    Batch_size : int
+        Training batch size
+    Test_fraction : float
+        Fraction of training data to use for validation
+    Number_of_free_cpus : int
+        How many CPU cores to leave free
+    """
+
     if Trained_model == Path.home():
         Trained_model = None
     if Model_weights == Path.home():
