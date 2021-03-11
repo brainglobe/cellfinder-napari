@@ -23,7 +23,8 @@ filter : str, optional
 
 
 @magic_factory(
-    YAML_file={"mode": "d"},
+    YAML_file=dict(mode="rm", filter="*.yml"),
+    Output_directory=dict(mode="d"),
     call_button=True,
 )
 def train(
