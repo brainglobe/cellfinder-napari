@@ -9,6 +9,8 @@ PRETRAINED_MODELS = list(model_weight_urls.keys())
 
 
 def init(widget):
+    widget.Learning_rate.native.setDecimals(4)
+    widget.Learning_rate.value = 0.0001
     widget.insert(0, widgets.Label(value="<h2>cellfinder</h2>"))
     widget.insert(1, widgets.Label(value="<h3>Network training</h3>"))
     widget.insert(2, widgets.Label(value="<b>Training data:</b>"))
@@ -21,7 +23,7 @@ def init(widget):
     YAML_files=dict(mode="rm", filter="*.yml"),
     Output_directory=dict(mode="d"),
     Test_fraction=dict(step=0.05, min=0.0, max=0.95),
-    Learning_rate=dict(step=0.0001, min=0.0001, max=0.0001),
+    Learning_rate=dict(step=0.0001),
     Pretrained_model=dict(choices=PRETRAINED_MODELS),
     Model_depth=dict(choices=MODELS),
     call_button=True,
