@@ -1,5 +1,6 @@
 import pandas as pd
 from imlib.cells.cells import Cell
+from imlib.IO.cells import cells_xml_to_df
 
 
 def cells_df_as_np(cells_df, new_order=[2, 1, 0], type_column="type"):
@@ -14,3 +15,14 @@ def cells_to_array(cells):
     points = cells_df_as_np(df[df["type"] == Cell.CELL])
     rejected = cells_df_as_np(df[df["type"] == Cell.UNKNOWN])
     return points, rejected
+
+
+def get_cell_arrays(cells_file):
+    df = cells_xml_to_df(cells_file)
+
+    non_cells = df[df["type"] == Cell.UNKNOWN]
+    cells = df[df["type"] == Cell.CELL]
+
+    cells = cells_df_as_np(cells)
+    non_cells = cells_df_as_np(non_cells)
+    return cells, non_cells

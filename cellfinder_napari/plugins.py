@@ -1,7 +1,7 @@
 from cellfinder_napari.train import train
 from cellfinder_napari.detect import detect
 from cellfinder_napari.curation import CurationWidget
-
+from cellfinder_napari.reader import napari_get_reader
 from napari_plugin_engine import napari_hook_implementation
 
 
