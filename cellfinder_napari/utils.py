@@ -26,3 +26,17 @@ def get_cell_arrays(cells_file):
     cells = cells_df_as_np(cells)
     non_cells = cells_df_as_np(non_cells)
     return cells, non_cells
+
+
+def convert_layer_to_cells(layer_data, cells=True):
+    cells_to_save = []
+    if cells:
+        type = Cell.CELL
+    else:
+        type = Cell.UNKNOWN
+
+    for idx, point in enumerate(layer_data):
+        cell = Cell([point[2], point[1], point[0]], type)
+        cells_to_save.append(cell)
+
+    return cells_to_save
