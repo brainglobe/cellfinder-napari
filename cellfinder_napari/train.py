@@ -21,6 +21,7 @@ def init(widget):
     YAML_files=dict(mode="rm", filter="*.yml"),
     Output_directory=dict(mode="d"),
     Test_fraction=dict(step=0.05, min=0.0, max=0.95),
+    Learning_rate=dict(step=0.0001, min=0.0001, max=0.0001),
     Pretrained_model=dict(choices=PRETRAINED_MODELS),
     Model_depth=dict(choices=MODELS),
     call_button=True,
@@ -90,7 +91,6 @@ def train(
     Number_of_free_cpus : int
         How many CPU cores to leave free
     """
-
     if Trained_model == Path.home():
         Trained_model = None
     if Model_weights == Path.home():
