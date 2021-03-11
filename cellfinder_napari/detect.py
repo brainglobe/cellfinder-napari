@@ -79,7 +79,8 @@ def detect(
     End_plane : int
         Last plane to process (to process a subset of the data)
     Ball_overlap : float
-        Fraction of the morphological filter needed to be filled to retain a voxel
+        Fraction of the morphological filter needed to be filled
+        to retain a voxel
     Filter_width : float
         Laplacian of Gaussian filter width (as a fraction of soma diameter)
     Threshold : int
@@ -87,7 +88,8 @@ def detect(
     Cell_spread : float
         Cell spread factor (for splitting up cell clusters)
     Max_cluster : int
-        Largest putative cell cluster (in cubic um) where splitting should be attempted
+        Largest putative cell cluster (in cubic um) where splitting
+        should be attempted
     Number_of_free_cpus : int
         How many CPU cores to leave free
     """
