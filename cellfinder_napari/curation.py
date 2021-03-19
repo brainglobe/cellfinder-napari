@@ -1,5 +1,4 @@
 import numpy as np
-import napari
 from pathlib import Path
 from qtpy import QtCore
 
@@ -23,6 +22,7 @@ from napari.utils.io import magic_imread
 
 from .utils import add_combobox, add_button
 
+import napari
 
 # Constants used throughout
 WINDOW_HEIGHT = 750
@@ -38,17 +38,32 @@ class CurationWidget(QWidget):
         super(CurationWidget, self).__init__()
 
         self.viewer = viewer
-
-        self.background_layer = []
+        self._get_image_layer_names()
+        self.background_layer = None
         self.background_path = ""
 
-        self.signal_layer = []
+        self.signal_layer = None
         self.signal_path = ""
 
         self.directory = ""
         self.output_directory = None
 
         self.setup_main_layout()
+
+        @self.viewer.layers.events.connect
+        def update_layer_list(v):
+            self._get_image_layer_names()
+            self.signal_image_choice.clear()
+            self.signal_image_choice.addItems(self.image_layer_names)
+            self.background_image_choice.clear()
+            self.background_image_choice.addItems(self.image_layer_names)
+
+    def _get_image_layer_names(self):
+        self.image_layer_names = [
+            layer.name
+            for layer in self.viewer.layers
+            if layer._type_string == "image"
+        ]
 
     def setup_main_layout(self):
         """
@@ -63,7 +78,7 @@ class CurationWidget(QWidget):
 
         self.status_label = QLabel()
         self.status_label.setText("Ready")
-        self.layout.addWidget(self.status_label, 5, 0)
+        self.layout.addWidget(self.status_label, 7, 0)
 
         self.setLayout(self.layout)
 
@@ -80,11 +95,26 @@ class CurationWidget(QWidget):
         self.load_data_layout.setContentsMargins(10, 10, 10, 10)
         self.load_data_layout.setAlignment(QtCore.Qt.AlignBottom)
 
+        self.signal_image_choice, _ = add_combobox(
+            self.load_data_layout,
+            "Signal image",
+            self.image_layer_names,
+            1,
+            callback=self.get_signal_image,
+        )
+        self.background_image_choice, _ = add_combobox(
+            self.load_data_layout,
+            "Background image",
+            self.image_layer_names,
+            2,
+            callback=self.get_background_image,
+        )
+
         self.load_signal_button = add_button(
             "Load signal",
             self.load_data_layout,
             self.get_signal,
-            2,
+            3,
             0,
             minimum_width=COLUMN_WIDTH,
         )
@@ -93,7 +123,7 @@ class CurationWidget(QWidget):
             "Add cell count",
             self.load_data_layout,
             self.add_cell_count,
-            3,
+            4,
             0,
             minimum_width=COLUMN_WIDTH,
         )
@@ -102,7 +132,7 @@ class CurationWidget(QWidget):
             "Load cell count",
             self.load_data_layout,
             self.load_cells,
-            4,
+            5,
             0,
             minimum_width=COLUMN_WIDTH,
         )
@@ -111,7 +141,7 @@ class CurationWidget(QWidget):
             "Save cells",
             self.load_data_layout,
             self.save_cell_count,
-            5,
+            6,
             0,
             minimum_width=COLUMN_WIDTH,
         )
@@ -260,3 +290,15 @@ class CurationWidget(QWidget):
                 options=options,
             )
             self.output_directory = Path(self.output_directory)
+
+    def get_signal_image(self):
+        if self.signal_image_choice.currentText() != "":
+            self.signal_layer = self.viewer.layers[
+                self.signal_image_choice.currentText()
+            ]
+
+    def get_background_image(self):
+        if self.background_image_choice.currentText() != "":
+            self.background_layer = self.viewer.layers[
+                self.background_image_choice.currentText()
+            ]
