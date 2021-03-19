@@ -21,63 +21,7 @@ from qtpy.QtWidgets import (
 from imlib.general.system import get_sorted_file_paths
 from napari.utils.io import magic_imread
 
-
-def add_combobox(
-    layout,
-    label,
-    items,
-    row,
-    column=0,
-    label_stack=False,
-    callback=None,
-    width=150,
-):
-    if label_stack:
-        combobox_row = row + 1
-        combobox_column = column
-    else:
-        combobox_row = row
-        combobox_column = column + 1
-    combobox = QComboBox()
-    combobox.addItems(items)
-    if callback:
-        combobox.currentIndexChanged.connect(callback)
-    combobox.setMaximumWidth = width
-
-    if label is not None:
-        combobox_label = QLabel(label)
-        combobox_label.setMaximumWidth = width
-        layout.addWidget(combobox_label, row, column)
-    else:
-        combobox_label = None
-
-    layout.addWidget(combobox, combobox_row, combobox_column)
-    return combobox, combobox_label
-
-
-def add_button(
-    label,
-    layout,
-    connected_function,
-    row,
-    column,
-    visibility=True,
-    minimum_width=0,
-    alignment="center",
-):
-    button = QPushButton(label)
-    if alignment == "center":
-        pass
-    elif alignment == "left":
-        button.setStyleSheet("QPushButton { text-align: left; }")
-    elif alignment == "right":
-        button.setStyleSheet("QPushButton { text-align: right; }")
-
-    button.setVisible(visibility)
-    button.setMinimumWidth(minimum_width)
-    layout.addWidget(button, row, column)
-    button.clicked.connect(connected_function)
-    return button
+from .utils import add_combobox, add_button
 
 
 # Constants used throughout

@@ -1,6 +1,16 @@
 import pandas as pd
+
+from qtpy.QtWidgets import (
+    QPushButton,
+    QLabel,
+    QComboBox,
+    QWidget,
+    QFileDialog,
+    QGridLayout,
+    QGroupBox,
+)
+
 from imlib.cells.cells import Cell
-from imlib.IO.cells import cells_xml_to_df
 
 
 def cells_df_as_np(cells_df, new_order=[2, 1, 0], type_column="type"):
@@ -17,26 +27,59 @@ def cells_to_array(cells):
     return points, rejected
 
 
-def get_cell_arrays(cells_file):
-    df = cells_xml_to_df(cells_file)
-
-    non_cells = df[df["type"] == Cell.UNKNOWN]
-    cells = df[df["type"] == Cell.CELL]
-
-    cells = cells_df_as_np(cells)
-    non_cells = cells_df_as_np(non_cells)
-    return cells, non_cells
-
-
-def convert_layer_to_cells(layer_data, cells=True):
-    cells_to_save = []
-    if cells:
-        type = Cell.CELL
+def add_combobox(
+    layout,
+    label,
+    items,
+    row,
+    column=0,
+    label_stack=False,
+    callback=None,
+    width=150,
+):
+    if label_stack:
+        combobox_row = row + 1
+        combobox_column = column
     else:
-        type = Cell.UNKNOWN
+        combobox_row = row
+        combobox_column = column + 1
+    combobox = QComboBox()
+    combobox.addItems(items)
+    if callback:
+        combobox.currentIndexChanged.connect(callback)
+    combobox.setMaximumWidth = width
 
-    for idx, point in enumerate(layer_data):
-        cell = Cell([point[2], point[1], point[0]], type)
-        cells_to_save.append(cell)
+    if label is not None:
+        combobox_label = QLabel(label)
+        combobox_label.setMaximumWidth = width
+        layout.addWidget(combobox_label, row, column)
+    else:
+        combobox_label = None
 
-    return cells_to_save
+    layout.addWidget(combobox, combobox_row, combobox_column)
+    return combobox, combobox_label
+
+
+def add_button(
+    label,
+    layout,
+    connected_function,
+    row,
+    column,
+    visibility=True,
+    minimum_width=0,
+    alignment="center",
+):
+    button = QPushButton(label)
+    if alignment == "center":
+        pass
+    elif alignment == "left":
+        button.setStyleSheet("QPushButton { text-align: left; }")
+    elif alignment == "right":
+        button.setStyleSheet("QPushButton { text-align: right; }")
+
+    button.setVisible(visibility)
+    button.setMinimumWidth(minimum_width)
+    layout.addWidget(button, row, column)
+    button.clicked.connect(connected_function)
+    return button
