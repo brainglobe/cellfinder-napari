@@ -10,6 +10,7 @@ from qtpy.QtWidgets import (
     QGridLayout,
     QGroupBox,
 )
+from imlib.cells.cells import Cell
 
 
 from .utils import add_combobox, add_button
@@ -117,6 +118,7 @@ class CurationWidget(QWidget):
             opacity=0.6,
             face_color="lightgoldenrodyellow",
             name="cells",
+            metadata=dict(point_type=Cell.UNKNOWN),
         )
 
     def get_signal_image(self):
