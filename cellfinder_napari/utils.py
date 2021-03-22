@@ -65,7 +65,7 @@ def add_button(
     layout,
     connected_function,
     row,
-    column,
+    column=0,
     visibility=True,
     minimum_width=0,
     alignment="center",

@@ -12,7 +12,7 @@ from qtpy.QtWidgets import (
 )
 from imlib.cells.cells import Cell
 
-
+from cellfinder_core.extract.extract_cubes import main as extract_cubes_main
 from .utils import add_combobox, add_button
 
 import napari
@@ -34,7 +34,8 @@ class CurationWidget(QWidget):
 
         self.signal_layer = None
         self.background_layer = None
-        self.training_data_layer = None
+        self.training_data_cell_layer = None
+        self.training_data_non_cell_layer = None
 
         self.image_layer_names = self._get_layer_names()
         self.point_layer_names = self._get_layer_names(layer_type="points")
@@ -55,7 +56,10 @@ class CurationWidget(QWidget):
                 self.background_image_choice, self.image_layer_names
             )
             self._update_combobox_options(
-                self.training_data_choice, self.point_layer_names
+                self.training_data_cell_choice, self.point_layer_names
+            )
+            self._update_combobox_options(
+                self.training_data_non_cell_choice, self.point_layer_names
             )
 
     @staticmethod
@@ -109,14 +113,33 @@ class CurationWidget(QWidget):
             2,
             callback=self.set_background_image,
         )
-        self.training_data_choice, _ = add_combobox(
+        self.training_data_cell_choice, _ = add_combobox(
             self.load_data_layout,
-            "Training_data",
+            "Training data (cells)",
             self.point_layer_names,
             3,
-            callback=self.set_training_data,
+            callback=self.set_training_data_cell,
         )
-
+        self.training_data_non_cell_choice, _ = add_combobox(
+            self.load_data_layout,
+            "Training_data (non_cells)",
+            self.point_layer_names,
+            4,
+            callback=self.set_training_data_non_cell,
+        )
+        self.add_training_data_button = add_button(
+            "Add training data",
+            self.load_data_layout,
+            self.add_training_data,
+            5,
+        )
+        self.extract_cube_button = add_button(
+            "Extract cubes",
+            self.load_data_layout,
+            self.extract_cubes,
+            5,
+            column=1,
+        )
         self.load_data_layout.setColumnMinimumWidth(0, COLUMN_WIDTH)
         self.load_data_panel.setLayout(self.load_data_layout)
         self.load_data_panel.setVisible(True)
@@ -134,10 +157,51 @@ class CurationWidget(QWidget):
                 self.background_image_choice.currentText()
             ]
 
-    def set_training_data(self):
-        if self.training_data_choice.currentText() != "":
-            self.training_data_layer = self.viewer.layers[
-                self.training_data_choice.currentText()
+    def set_training_data_cell(self):
+        if self.training_data_cell_choice.currentText() != "":
+            self.training_data_cell_layer = self.viewer.layers[
+                self.training_data_cell_choice.currentText()
             ]
-            self.training_data_layer.metadata["point_type"] = Cell.UNKNOWN
-            self.training_data_layer.metadata["training_data"] = True
+            self.training_data_cell_layer.metadata["point_type"] = Cell.CELL
+            self.training_data_cell_layer.metadata["training_data"] = True
+
+    def set_training_data_non_cell(self):
+        if self.training_data_non_cell_choice.currentText() != "":
+            self.training_data_non_cell_layer = self.viewer.layers[
+                self.training_data_non_cell_choice.currentText()
+            ]
+            self.training_data_non_cell_layer.metadata[
+                "point_type"
+            ] = Cell.UNKNOWN
+            self.training_data_non_cell_layer.metadata["training_data"] = True
+
+    def add_training_data(
+        self,
+        cell_name="Training data (cells)",
+        non_cell_name="Training data (non cells)",
+    ):
+        self.training_data_cell_layer = self.viewer.add_points(
+            np.empty((0, 3)),
+            symbol="ring",
+            n_dimensional=True,
+            size=15,
+            opacity=0.6,
+            face_color="lightgoldenrodyellow",
+            name=cell_name,
+            metadata=dict(point_type=Cell.CELL, training_data=True),
+        )
+        self.training_data_cell_layer = self.viewer.add_points(
+            np.empty((0, 3)),
+            symbol="ring",
+            n_dimensional=True,
+            size=15,
+            opacity=0.6,
+            face_color="lightskyblue",
+            name=non_cell_name,
+            metadata=dict(point_type=Cell.UNKNOWN, training_data=True),
+        )
+        self.training_data_cell_choice.setCurrentText(cell_name)
+        self.training_data_non_cell_choice.setCurrentText(non_cell_name)
+
+    def extract_cubes(self):
+        print("Extracting cubes")
