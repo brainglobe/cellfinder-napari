@@ -218,28 +218,43 @@ class CurationWidget(QWidget):
         cell_name="Training data (cells)",
         non_cell_name="Training data (non cells)",
     ):
-        self.training_data_cell_layer = self.viewer.add_points(
-            np.empty((0, 3)),
-            symbol="ring",
-            n_dimensional=True,
-            size=15,
-            opacity=0.6,
-            face_color="lightgoldenrodyellow",
-            name=cell_name,
-            metadata=dict(point_type=Cell.CELL, training_data=True),
-        )
-        self.training_data_cell_layer = self.viewer.add_points(
-            np.empty((0, 3)),
-            symbol="ring",
-            n_dimensional=True,
-            size=15,
-            opacity=0.6,
-            face_color="lightskyblue",
-            name=non_cell_name,
-            metadata=dict(point_type=Cell.UNKNOWN, training_data=True),
-        )
-        self.training_data_cell_choice.setCurrentText(cell_name)
-        self.training_data_non_cell_choice.setCurrentText(non_cell_name)
+        if not (
+            self.training_data_cell_layer and self.training_data_non_cell_layer
+        ):
+            if not self.training_data_cell_layer:
+                self.training_data_cell_layer = self.viewer.add_points(
+                    np.empty((0, 3)),
+                    symbol="ring",
+                    n_dimensional=True,
+                    size=15,
+                    opacity=0.6,
+                    face_color="lightgoldenrodyellow",
+                    name=cell_name,
+                    metadata=dict(point_type=Cell.CELL, training_data=True),
+                )
+                self.training_data_cell_choice.setCurrentText(cell_name)
+
+            if not self.training_data_non_cell_layer:
+                self.training_data_cell_layer = self.viewer.add_points(
+                    np.empty((0, 3)),
+                    symbol="ring",
+                    n_dimensional=True,
+                    size=15,
+                    opacity=0.6,
+                    face_color="lightskyblue",
+                    name=non_cell_name,
+                    metadata=dict(point_type=Cell.UNKNOWN, training_data=True),
+                )
+                self.training_data_non_cell_choice.setCurrentText(
+                    non_cell_name
+                )
+        else:
+            display_info(
+                self,
+                "Training data layers exist",
+                "Training data layers already exist,  "
+                "no more layers will be added.",
+            )
 
     def extract_cubes(self):
         if self.check_training_data_exists():
