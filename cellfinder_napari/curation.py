@@ -18,6 +18,7 @@ from imlib.cells.cells import Cell
 from imlib.IO.cells import cells_xml_to_df, save_cells, get_cells
 from imlib.general.system import get_sorted_file_paths, ensure_directory_exists
 from imlib.general.list import unique_elements_lists
+from imlib.IO.yaml import save_yaml
 
 from cellfinder_core.extract.extract_cubes import main as extract_cubes_main
 from .utils import add_combobox, add_button, display_info
@@ -35,12 +36,13 @@ class CurationWidget(QWidget):
     def __init__(
         self,
         viewer: napari.viewer.Viewer,
-        cube_depth=50,
-        cube_width=20,
-        cube_height=20,
+        cube_depth=20,
+        cube_width=50,
+        cube_height=50,
         network_voxel_sizes=[5, 1, 1],
         n_free_cpus=2,
         save_empty_cubes=False,
+        max_ram=None,
     ):
         super(CurationWidget, self).__init__()
 
@@ -53,6 +55,8 @@ class CurationWidget(QWidget):
         self.network_voxel_sizes = network_voxel_sizes
         self.n_free_cpus = n_free_cpus
         self.save_empty_cubes = save_empty_cubes
+        self.max_ram = max_ram
+        self.voxel_sizes = [5, 2, 2]
 
         self.viewer = viewer
 
@@ -92,8 +96,10 @@ class CurationWidget(QWidget):
 
     @staticmethod
     def _update_combobox_options(combobox, options_list):
+        original_text = combobox.currentText()
         combobox.clear()
         combobox.addItems(options_list)
+        combobox.setCurrentText(original_text)
 
     def _get_layer_names(self, layer_type=napari.layers.Image):
         return [
@@ -237,31 +243,33 @@ class CurationWidget(QWidget):
             self.get_output_directory()
             self.status_label.setText("Extracting cubes")
             self.convert_layers_to_cells()
-            # to_extract = {
-            #     "cells": self.cells_to_extract,
-            #     "non_cells": self.non_cells_to_extract,
-            # }
+            to_extract = {
+                "cells": self.cells_to_extract,
+                "non_cells": self.non_cells_to_extract,
+            }
 
-            #
-            # for cell_type, cell_list in to_extract.items():
-            #     print(f"Extracting type: {cell_type}")
-            #     cell_type_output_directory = self.output_directory / cell_type
-            #     print(f"Saving to: {cell_type_output_directory}")
-            #     ensure_directory_exists(str(cell_type_output_directory))
-            #     extract_cubes_main(
-            #         cell_list,
-            #         cell_type_output_directory,
-            #         self.signal_layer.data,
-            #         self.background_layer.data,
-            #         self.cube_depth,
-            #         self.cube_width,
-            #         self.cube_height,
-            #         voxel_sizes,
-            #         self.network_voxel_sizes,
-            #         max_ram,
-            #         self.n_free_cpus,
-            #         self.save_empty_cubes,
-            #     )
+            for cell_type, cell_list in to_extract.items():
+                print(f"Extracting type: {cell_type}")
+                cell_type_output_directory = self.output_directory / cell_type
+                print(f"Saving to: {cell_type_output_directory}")
+                ensure_directory_exists(str(cell_type_output_directory))
+                extract_cubes_main(
+                    cell_list,
+                    cell_type_output_directory,
+                    self.signal_layer.data,
+                    self.background_layer.data,
+                    self.cube_depth,
+                    self.cube_width,
+                    self.cube_height,
+                    self.voxel_sizes,
+                    self.network_voxel_sizes,
+                    self.max_ram,
+                    self.n_free_cpus,
+                    self.save_empty_cubes,
+                )
+
+                self.save_yaml_file()
+
             self.status_label.setText("Ready")
 
     def check_training_data_exists(self):
@@ -312,3 +320,26 @@ class CurationWidget(QWidget):
         self.non_cells_to_extract = convert_layer_to_cells(
             self.training_data_non_cell_layer.data, cells=False
         )
+
+    def save_yaml_file(self):
+        # TODO: implement this in a portable way
+        yaml_filename = self.output_directory / "training.yml"
+        yaml_section = [
+            {
+                "cube_dir": str(self.output_directory / "cells"),
+                "cell_def": "",
+                "type": "cell",
+                "signal_channel": 0,
+                "bg_channel": 1,
+            },
+            {
+                "cube_dir": str(self.output_directory / "non_cells"),
+                "cell_def": "",
+                "type": "no_cell",
+                "signal_channel": 0,
+                "bg_channel": 1,
+            },
+        ]
+
+        yaml_contents = {"data": yaml_section}
+        save_yaml(yaml_contents, yaml_filename)
