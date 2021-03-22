@@ -31,7 +31,9 @@ class CurationWidget(QWidget):
         super(CurationWidget, self).__init__()
 
         self.viewer = viewer
-        self._get_image_layer_names()
+
+        self.image_layer_names = self._get_layer_names()
+
         self.background_layer = None
 
         self.signal_layer = None
@@ -42,17 +44,25 @@ class CurationWidget(QWidget):
 
         @self.viewer.layers.events.connect
         def update_layer_list(v):
-            self._get_image_layer_names()
+            self.image_layer_names = self._get_layer_names()
             self.signal_image_choice.clear()
-            self.signal_image_choice.addItems(self.image_layer_names)
-            self.background_image_choice.clear()
-            self.background_image_choice.addItems(self.image_layer_names)
+            self._update_combobox_options(
+                self.signal_image_choice, self.image_layer_names
+            )
+            self._update_combobox_options(
+                self.background_image_choice, self.image_layer_names
+            )
 
-    def _get_image_layer_names(self):
-        self.image_layer_names = [
+    @staticmethod
+    def _update_combobox_options(combobox, options_list):
+        combobox.clear()
+        combobox.addItems(options_list)
+
+    def _get_layer_names(self, layer_type="image"):
+        return [
             layer.name
             for layer in self.viewer.layers
-            if layer._type_string == "image"
+            if layer._type_string == layer_type
         ]
 
     def setup_main_layout(self):
