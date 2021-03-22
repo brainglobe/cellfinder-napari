@@ -8,6 +8,7 @@ from qtpy.QtWidgets import (
     QFileDialog,
     QGridLayout,
     QGroupBox,
+    QMessageBox,
 )
 
 from imlib.cells.cells import Cell
@@ -83,3 +84,28 @@ def add_button(
     layout.addWidget(button, row, column)
     button.clicked.connect(connected_function)
     return button
+
+
+def display_info(widget, title, message):
+    """
+    Display a warning in a pop up that informs
+    about overwriting files
+    """
+    QMessageBox.information(widget, title, message, QMessageBox.Ok)
+
+
+def display_question(widget, title, message):
+    """
+    Display a warning in a pop up that informs
+    about overwriting files
+    """
+    message_reply = QMessageBox.question(
+        widget,
+        title,
+        message,
+        QMessageBox.Yes | QMessageBox.Cancel,
+    )
+    if message_reply == QMessageBox.Yes:
+        return True
+    else:
+        return False
