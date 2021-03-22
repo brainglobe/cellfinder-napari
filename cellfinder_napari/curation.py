@@ -257,39 +257,75 @@ class CurationWidget(QWidget):
             )
 
     def extract_cubes(self):
-        if self.check_training_data_exists():
-
+        if self.is_data_extractable():
             self.get_output_directory()
-            self.status_label.setText("Extracting cubes")
-            self.convert_layers_to_cells()
-            to_extract = {
-                "cells": self.cells_to_extract,
-                "non_cells": self.non_cells_to_extract,
-            }
+            if self.output_directory != "":
+                self.status_label.setText("Extracting cubes")
+                self.convert_layers_to_cells()
+                to_extract = {
+                    "cells": self.cells_to_extract,
+                    "non_cells": self.non_cells_to_extract,
+                }
 
-            for cell_type, cell_list in to_extract.items():
-                print(f"Extracting type: {cell_type}")
-                cell_type_output_directory = self.output_directory / cell_type
-                print(f"Saving to: {cell_type_output_directory}")
-                ensure_directory_exists(str(cell_type_output_directory))
-                extract_cubes_main(
-                    cell_list,
-                    cell_type_output_directory,
-                    self.signal_layer.data,
-                    self.background_layer.data,
-                    self.cube_depth,
-                    self.cube_width,
-                    self.cube_height,
-                    self.voxel_sizes,
-                    self.network_voxel_sizes,
-                    self.max_ram,
-                    self.n_free_cpus,
-                    self.save_empty_cubes,
-                )
+                for cell_type, cell_list in to_extract.items():
+                    print(f"Extracting type: {cell_type}")
+                    cell_type_output_directory = (
+                        self.output_directory / cell_type
+                    )
+                    print(f"Saving to: {cell_type_output_directory}")
+                    ensure_directory_exists(str(cell_type_output_directory))
+                    extract_cubes_main(
+                        cell_list,
+                        cell_type_output_directory,
+                        self.signal_layer.data,
+                        self.background_layer.data,
+                        self.cube_depth,
+                        self.cube_width,
+                        self.cube_height,
+                        self.voxel_sizes,
+                        self.network_voxel_sizes,
+                        self.max_ram,
+                        self.n_free_cpus,
+                        self.save_empty_cubes,
+                    )
 
-                self.save_yaml_file()
+                    self.save_yaml_file()
 
             self.status_label.setText("Ready")
+
+    def is_data_extractable(self):
+        if (
+            self.check_training_data_exists()
+            and self.check_image_data_for_extraction()
+        ):
+            return True
+        else:
+            return False
+
+    def check_image_data_for_extraction(self):
+        if self.signal_layer and self.background_layer:
+            if (
+                self.signal_layer.data.shape
+                == self.background_layer.data.shape
+            ):
+                return True
+            else:
+                display_info(
+                    self,
+                    "Images not the same shape",
+                    "Please ensure both signal and background images are the "
+                    "same size and shape.",
+                )
+                return False
+
+        else:
+            display_info(
+                self,
+                "No image data for cube extraction",
+                "Please ensure both signal and background images are loaded "
+                "into napari, and selected in the sidebar. ",
+            )
+            return False
 
     def check_training_data_exists(self):
         if not (
@@ -329,7 +365,8 @@ class CurationWidget(QWidget):
             "Select output directory",
             options=options,
         )
-        self.output_directory = Path(self.output_directory)
+        if self.output_directory != "":
+            self.output_directory = Path(self.output_directory)
 
     def convert_layers_to_cells(self):
 
