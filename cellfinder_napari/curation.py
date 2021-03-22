@@ -22,6 +22,7 @@ from imlib.IO.yaml import save_yaml
 
 from cellfinder_core.extract.extract_cubes import main as extract_cubes_main
 from .utils import add_combobox, add_button, display_info
+from cellfinder_core.classify.cube_generator import CubeGeneratorFromFile
 
 import napari
 
@@ -57,7 +58,7 @@ class CurationWidget(QWidget):
         self.save_empty_cubes = save_empty_cubes
         self.max_ram = max_ram
         self.voxel_sizes = [5, 2, 2]
-
+        self.batch_size = 32
         self.viewer = viewer
 
         self.signal_layer = None
@@ -274,20 +275,18 @@ class CurationWidget(QWidget):
                     )
                     print(f"Saving to: {cell_type_output_directory}")
                     ensure_directory_exists(str(cell_type_output_directory))
-                    extract_cubes_main(
-                        cell_list,
-                        cell_type_output_directory,
-                        self.signal_layer.data,
-                        self.background_layer.data,
-                        self.cube_depth,
-                        self.cube_width,
-                        self.cube_height,
-                        self.voxel_sizes,
-                        self.network_voxel_sizes,
-                        self.max_ram,
-                        self.n_free_cpus,
-                        self.save_empty_cubes,
-                    )
+
+                    # cube_generator = CubeGeneratorFromFile(
+                    #     cell_list,
+                    #     self.signal_layer.data,
+                    #     self.background_layer.data,
+                    #     self.voxel_sizes,
+                    #     self.network_voxel_sizes,
+                    #     batch_size=self.batch_size,
+                    #     cube_width=self.cube_width,
+                    #     cube_height=self.cube_height,
+                    #     cube_depth=self.cube_depth,
+                    # )
 
                     self.save_yaml_file()
 
