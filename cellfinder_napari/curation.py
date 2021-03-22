@@ -80,7 +80,6 @@ class CurationWidget(QWidget):
             self.point_layer_names = self._get_layer_names(
                 layer_type=napari.layers.Points
             )
-            self.signal_image_choice.clear()
             self._update_combobox_options(
                 self.signal_image_choice, self.image_layer_names
             )
@@ -101,12 +100,17 @@ class CurationWidget(QWidget):
         combobox.addItems(options_list)
         combobox.setCurrentText(original_text)
 
-    def _get_layer_names(self, layer_type=napari.layers.Image):
-        return [
+    def _get_layer_names(self, layer_type=napari.layers.Image, default=""):
+        layer_names = [
             layer.name
             for layer in self.viewer.layers
             if type(layer) == layer_type
         ]
+
+        if layer_names:
+            return [default] + layer_names
+        else:
+            return [default]
 
     def setup_main_layout(self):
         """
