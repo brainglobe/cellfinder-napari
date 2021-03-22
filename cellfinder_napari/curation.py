@@ -32,11 +32,12 @@ class CurationWidget(QWidget):
 
         self.viewer = viewer
 
-        self.image_layer_names = self._get_layer_names()
-
-        self.background_layer = None
-
         self.signal_layer = None
+        self.background_layer = None
+        self.training_data_layer = None
+
+        self.image_layer_names = self._get_layer_names()
+        self.point_layer_names = self._get_layer_names(layer_type="points")
 
         self.output_directory = None
 
@@ -45,12 +46,16 @@ class CurationWidget(QWidget):
         @self.viewer.layers.events.connect
         def update_layer_list(v):
             self.image_layer_names = self._get_layer_names()
+            self.point_layer_names = self._get_layer_names(layer_type="points")
             self.signal_image_choice.clear()
             self._update_combobox_options(
                 self.signal_image_choice, self.image_layer_names
             )
             self._update_combobox_options(
                 self.background_image_choice, self.image_layer_names
+            )
+            self._update_combobox_options(
+                self.training_data_choice, self.point_layer_names
             )
 
     @staticmethod
@@ -95,23 +100,21 @@ class CurationWidget(QWidget):
             "Signal image",
             self.image_layer_names,
             1,
-            callback=self.get_signal_image,
+            callback=self.set_signal_image,
         )
         self.background_image_choice, _ = add_combobox(
             self.load_data_layout,
             "Background image",
             self.image_layer_names,
             2,
-            callback=self.get_background_image,
+            callback=self.set_background_image,
         )
-
-        self.add_cells_button = add_button(
-            "Add cell count",
+        self.training_data_choice, _ = add_combobox(
             self.load_data_layout,
-            self.add_cell_count,
+            "Training_data",
+            self.point_layer_names,
             3,
-            0,
-            minimum_width=COLUMN_WIDTH,
+            callback=self.set_training_data,
         )
 
         self.load_data_layout.setColumnMinimumWidth(0, COLUMN_WIDTH)
@@ -119,26 +122,22 @@ class CurationWidget(QWidget):
         self.load_data_panel.setVisible(True)
         self.layout.addWidget(self.load_data_panel, row, column, 1, 1)
 
-    def add_cell_count(self):
-        self.cell_layer = self.viewer.add_points(
-            np.empty((0, 3)),
-            symbol="ring",
-            n_dimensional=True,
-            size=10,
-            opacity=0.6,
-            face_color="lightgoldenrodyellow",
-            name="cells",
-            metadata=dict(point_type=Cell.UNKNOWN),
-        )
-
-    def get_signal_image(self):
+    def set_signal_image(self):
         if self.signal_image_choice.currentText() != "":
             self.signal_layer = self.viewer.layers[
                 self.signal_image_choice.currentText()
             ]
 
-    def get_background_image(self):
+    def set_background_image(self):
         if self.background_image_choice.currentText() != "":
             self.background_layer = self.viewer.layers[
                 self.background_image_choice.currentText()
             ]
+
+    def set_training_data(self):
+        if self.training_data_choice.currentText() != "":
+            self.training_data_layer = self.viewer.layers[
+                self.training_data_choice.currentText()
+            ]
+            self.training_data_layer.metadata["point_type"] = Cell.UNKNOWN
+            self.training_data_layer.metadata["training_data"] = True
