@@ -169,10 +169,10 @@ class CurationWidget(QWidget):
             self.add_training_data,
             5,
         )
-        self.extract_cube_button = add_button(
-            "Extract cubes",
+        self.save_training_data_button = add_button(
+            "Save training data",
             self.load_data_layout,
-            self.extract_cubes,
+            self.save_training_data,
             5,
             column=1,
         )
@@ -254,46 +254,44 @@ class CurationWidget(QWidget):
                 "no more layers will be added.",
             )
 
-    def extract_cubes(self):
+    def save_training_data(self):
         if self.is_data_extractable():
             self.get_output_directory()
             if self.output_directory != "":
-                self.status_label.setText("Extracting cubes")
-                self.convert_layers_to_cells()
-                to_extract = {
-                    "cells": self.cells_to_extract,
-                    "non_cells": self.non_cells_to_extract,
-                }
-
-                for cell_type, cell_list in to_extract.items():
-                    print(f"Extracting type: {cell_type}")
-                    cell_type_output_directory = (
-                        self.output_directory / cell_type
-                    )
-                    print(f"Saving to: {cell_type_output_directory}")
-                    ensure_directory_exists(str(cell_type_output_directory))
-
-                    cube_generator = CubeGeneratorFromFile(
-                        cell_list,
-                        self.signal_layer.data,
-                        self.background_layer.data,
-                        self.voxel_sizes,
-                        self.network_voxel_sizes,
-                        batch_size=self.batch_size,
-                        cube_width=self.cube_width,
-                        cube_height=self.cube_height,
-                        cube_depth=self.cube_depth,
-                        extract=True,
-                    )
-
-                    self.extract_batches(
-                        cube_generator, cell_type_output_directory
-                    )
-
-                    self.save_yaml_file()
-                    print("Done")
+                self.extract_cubes()
+                self.save_yaml_file()
+                print("Done")
 
             self.status_label.setText("Ready")
+
+    def extract_cubes(self):
+        self.status_label.setText("Extracting cubes")
+        self.convert_layers_to_cells()
+        to_extract = {
+            "cells": self.cells_to_extract,
+            "non_cells": self.non_cells_to_extract,
+        }
+
+        for cell_type, cell_list in to_extract.items():
+            print(f"Extracting type: {cell_type}")
+            cell_type_output_directory = self.output_directory / cell_type
+            print(f"Saving to: {cell_type_output_directory}")
+            ensure_directory_exists(str(cell_type_output_directory))
+
+            cube_generator = CubeGeneratorFromFile(
+                cell_list,
+                self.signal_layer.data,
+                self.background_layer.data,
+                self.voxel_sizes,
+                self.network_voxel_sizes,
+                batch_size=self.batch_size,
+                cube_width=self.cube_width,
+                cube_height=self.cube_height,
+                cube_depth=self.cube_depth,
+                extract=True,
+            )
+
+            self.extract_batches(cube_generator, cell_type_output_directory)
 
     def is_data_extractable(self):
         if (
