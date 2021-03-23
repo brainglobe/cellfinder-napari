@@ -18,7 +18,7 @@ from imlib.cells.cells import Cell
 from imlib.general.system import get_sorted_file_paths, ensure_directory_exists
 from imlib.IO.yaml import save_yaml
 
-from .utils import add_combobox, add_button, display_info
+from .utils import add_combobox, add_button, display_info, display_question
 from cellfinder_core.classify.cube_generator import CubeGeneratorFromFile
 
 import napari
@@ -163,17 +163,30 @@ class CurationWidget(QWidget):
             4,
             callback=self.set_training_data_non_cell,
         )
+        self.mark_as_cell_button = add_button(
+            "Mark as cell(s)",
+            self.load_data_layout,
+            self.mark_as_cell,
+            5,
+        )
+        self.mark_as_non_cell_button = add_button(
+            "Mark as non cell(s)",
+            self.load_data_layout,
+            self.mark_as_non_cell,
+            5,
+            column=1,
+        )
         self.add_training_data_button = add_button(
-            "Add training data",
+            "Add training data layers",
             self.load_data_layout,
             self.add_training_data,
-            5,
+            6,
         )
         self.save_training_data_button = add_button(
             "Save training data",
             self.load_data_layout,
             self.save_training_data,
-            5,
+            6,
             column=1,
         )
         self.load_data_layout.setColumnMinimumWidth(0, COLUMN_WIDTH)
@@ -246,12 +259,79 @@ class CurationWidget(QWidget):
                 self.training_data_non_cell_choice.setCurrentText(
                     non_cell_name
                 )
+
         else:
             display_info(
                 self,
                 "Training data layers exist",
                 "Training data layers already exist,  "
                 "no more layers will be added.",
+            )
+
+    def mark_as_cell(self):
+        self.mark_point_as_type("cell")
+
+    def mark_as_non_cell(self):
+        self.mark_point_as_type("non-cell")
+
+    def mark_point_as_type(self, point_type):
+        if not (
+            self.training_data_cell_layer and self.training_data_non_cell_layer
+        ):
+            display_info(
+                self,
+                "No training data layers",
+                "No training data layers have been chosen. "
+                "Please add training data layers. ",
+            )
+            return
+
+        if len(self.viewer.layers.selected) == 1:
+            layer = self.viewer.layers.selected[0]
+            if type(layer) == napari.layers.Points:
+
+                if len(layer.data) > 0:
+                    if point_type == "cell":
+                        destination_layer = self.training_data_cell_layer
+                    else:
+                        destination_layer = self.training_data_non_cell_layer
+                    print(
+                        f"Adding {len(layer.data)} points to layer: "
+                        f"{destination_layer.name}"
+                    )
+
+                    destination_layer.data = np.vstack(
+                        (destination_layer.data, layer.data)
+                    )
+
+                else:
+                    display_info(
+                        self,
+                        "Not points selected",
+                        "No points are selected in the current layer. "
+                        "Please select some points.",
+                    )
+
+            else:
+                display_info(
+                    self,
+                    "Not a points layer",
+                    "This is not a points layer. "
+                    "Please choose a points layer, and select some points.",
+                )
+        elif len(self.viewer.layers.selected) == 0:
+            display_info(
+                self,
+                "No layers selected",
+                "No layers are selected. "
+                "Please choose a single points layer, and select some points.",
+            )
+        else:
+            display_info(
+                self,
+                "Too many layers selected",
+                "More than one layer is selected. "
+                "Please choose a single points layer, and select some points.",
             )
 
     def save_training_data(self):
