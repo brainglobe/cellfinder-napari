@@ -15,12 +15,9 @@ from qtpy.QtWidgets import (
 import tifffile
 from brainglobe_napari_io.cellfinder.utils import convert_layer_to_cells
 from imlib.cells.cells import Cell
-from imlib.IO.cells import cells_xml_to_df, save_cells, get_cells
 from imlib.general.system import get_sorted_file_paths, ensure_directory_exists
-from imlib.general.list import unique_elements_lists
 from imlib.IO.yaml import save_yaml
 
-from cellfinder_core.extract.extract_cubes import main as extract_cubes_main
 from .utils import add_combobox, add_button, display_info
 from cellfinder_core.classify.cube_generator import CubeGeneratorFromFile
 
@@ -381,30 +378,24 @@ class CurationWidget(QWidget):
             self.training_data_non_cell_layer.data, cells=False
         )
 
-    @staticmethod
-    def extract_batches(cube_generator, output_directory):
+    def extract_batches(self, cube_generator, output_directory):
         for batch_idx, (image_batch, batch_info) in enumerate(cube_generator):
             image_batch = image_batch.astype(np.int16)
             for point, point_info in zip(image_batch, batch_info):
-
-                ch0_filename = (
-                    f"pCellz{point_info['z']}y{point_info['y']}"
-                    f"x{point_info['x']}Ch0.tif"
-                )
-                ch1_filename = (
-                    f"pCellz{point_info['z']}y{point_info['y']}"
-                    f"x{point_info['x']}Ch1.tif"
-                )
-
                 point = np.moveaxis(point, 2, 0)
-                tifffile.imsave(
-                    output_directory / ch0_filename, point[:, :, :, 0]
-                )
 
-                tifffile.imsave(
-                    output_directory / ch1_filename,
-                    point[:, :, :, 1],
-                )
+                for channel in range(0, point.shape[-1]):
+                    self.__save_cube(
+                        point, point_info, channel, output_directory
+                    )
+
+    @staticmethod
+    def __save_cube(array, point_info, channel, output_directory):
+        filename = (
+            f"pCellz{point_info['z']}y{point_info['y']}"
+            f"x{point_info['x']}Ch{channel}.tif"
+        )
+        tifffile.imsave(output_directory / filename, array[:, :, :, channel])
 
     def save_yaml_file(self):
         # TODO: implement this in a portable way
