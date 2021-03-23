@@ -457,6 +457,9 @@ class CurationWidget(QWidget):
             self.training_data_non_cell_layer.data, cells=False
         )
 
+        self.cells_to_extract = list(set(self.cells_to_extract))
+        self.non_cells_to_extract = list(set(self.non_cells_to_extract))
+
     def extract_batches(self, cube_generator, output_directory):
         for batch_idx, (image_batch, batch_info) in enumerate(cube_generator):
             image_batch = image_batch.astype(np.int16)
