@@ -291,6 +291,7 @@ class CurationWidget(QWidget):
                     )
 
                     self.save_yaml_file()
+                    print("Done")
 
             self.status_label.setText("Ready")
 
