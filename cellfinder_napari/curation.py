@@ -12,7 +12,7 @@ from qtpy.QtWidgets import (
     QGridLayout,
     QGroupBox,
 )
-
+import tifffile
 from brainglobe_napari_io.cellfinder.utils import convert_layer_to_cells
 from imlib.cells.cells import Cell
 from imlib.IO.cells import cells_xml_to_df, save_cells, get_cells
@@ -236,7 +236,7 @@ class CurationWidget(QWidget):
                 self.training_data_cell_choice.setCurrentText(cell_name)
 
             if not self.training_data_non_cell_layer:
-                self.training_data_cell_layer = self.viewer.add_points(
+                self.training_data_non_cell_layer = self.viewer.add_points(
                     np.empty((0, 3)),
                     symbol="ring",
                     n_dimensional=True,
@@ -276,17 +276,22 @@ class CurationWidget(QWidget):
                     print(f"Saving to: {cell_type_output_directory}")
                     ensure_directory_exists(str(cell_type_output_directory))
 
-                    # cube_generator = CubeGeneratorFromFile(
-                    #     cell_list,
-                    #     self.signal_layer.data,
-                    #     self.background_layer.data,
-                    #     self.voxel_sizes,
-                    #     self.network_voxel_sizes,
-                    #     batch_size=self.batch_size,
-                    #     cube_width=self.cube_width,
-                    #     cube_height=self.cube_height,
-                    #     cube_depth=self.cube_depth,
-                    # )
+                    cube_generator = CubeGeneratorFromFile(
+                        cell_list,
+                        self.signal_layer.data,
+                        self.background_layer.data,
+                        self.voxel_sizes,
+                        self.network_voxel_sizes,
+                        batch_size=self.batch_size,
+                        cube_width=self.cube_width,
+                        cube_height=self.cube_height,
+                        cube_depth=self.cube_depth,
+                        extract=True,
+                    )
+
+                    self.extract_batches(
+                        cube_generator, cell_type_output_directory
+                    )
 
                     self.save_yaml_file()
 
@@ -375,6 +380,31 @@ class CurationWidget(QWidget):
         self.non_cells_to_extract = convert_layer_to_cells(
             self.training_data_non_cell_layer.data, cells=False
         )
+
+    @staticmethod
+    def extract_batches(cube_generator, output_directory):
+        for batch_idx, (image_batch, batch_info) in enumerate(cube_generator):
+            image_batch = image_batch.astype(np.int16)
+            for point, point_info in zip(image_batch, batch_info):
+
+                ch0_filename = (
+                    f"pCellz{point_info['z']}y{point_info['y']}"
+                    f"x{point_info['x']}Ch0.tif"
+                )
+                ch1_filename = (
+                    f"pCellz{point_info['z']}y{point_info['y']}"
+                    f"x{point_info['x']}Ch1.tif"
+                )
+
+                point = np.moveaxis(point, 2, 0)
+                tifffile.imsave(
+                    output_directory / ch0_filename, point[:, :, :, 0]
+                )
+
+                tifffile.imsave(
+                    output_directory / ch1_filename,
+                    point[:, :, :, 1],
+                )
 
     def save_yaml_file(self):
         # TODO: implement this in a portable way
