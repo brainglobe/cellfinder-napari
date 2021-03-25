@@ -3,14 +3,23 @@ from pathlib import Path
 
 from magicgui import magic_factory, widgets
 from typing import List
+from math import ceil
 
 # from napari.qt.threading import thread_worker
 from copy import deepcopy
+
 from cellfinder_core.main import main as cellfinder_run
+from cellfinder_core.classify.cube_generator import get_cube_depth_min_max
 from .utils import cells_to_array
 
 # TODO:
 # how to store & fetch pre-trained models?
+
+# TODO: params to add
+NETWORK_VOXEL_SIZES = [5, 1, 1]
+CUBE_WIDTH = 50
+CUBE_HEIGHT = 20
+CUBE_DEPTH = 20
 
 
 def init(widget):
@@ -40,6 +49,7 @@ def init(widget):
     # persist=True,
 )
 def detect(
+    viewer: napari.Viewer,
     Signal_image: napari.layers.Image,
     Background_image: napari.layers.Image,
     voxel_size_z: float = 5,
@@ -57,6 +67,7 @@ def detect(
     Start_plane: int = 0,
     End_plane: int = 0,
     Number_of_free_cpus: int = 2,
+    Analyse_field_of_view: bool = False,
 ) -> List[napari.types.LayerDataTuple]:
     """
 
@@ -92,8 +103,9 @@ def detect(
         should be attempted
     Number_of_free_cpus : int
         How many CPU cores to leave free
+    Analyse_field_of_view : Only analyse the visible part of the image,
+        with the minimum amount of 3D information
     """
-
     if End_plane == 0:
         End_plane = len(Signal_image.data)
 
@@ -101,9 +113,35 @@ def detect(
     if Trained_model == Path.home():
         Trained_model = None
 
+    if Analyse_field_of_view:
+        index = list(
+            slice(int(i[0]), int(i[1])) for i in Signal_image.corner_pixels.T
+        )
+        index[0] = slice(0, len(Signal_image.data))
+
+        signal_data = Signal_image.data[tuple(index)]
+        background_data = Signal_image.data[tuple(index)]
+
+        current_plane = viewer.dims.current_step[0]
+
+        # so a reasonable number of cells in the plane are detected
+        planes_needed = 2 * int(
+            ceil((CUBE_DEPTH * NETWORK_VOXEL_SIZES[0]) / voxel_size_z)
+        )
+
+        Start_plane, End_plane = get_cube_depth_min_max(
+            current_plane, planes_needed
+        )
+        Start_plane = max(0, Start_plane)
+        End_plane = min(len(Signal_image.data), End_plane)
+
+    else:
+        signal_data = Signal_image.data
+        background_data = Background_image.data
+
     points = run(
-        Signal_image.data,
-        Background_image.data,
+        signal_data,
+        background_data,
         voxel_sizes,
         Soma_diameter,
         ball_xy_size,
@@ -119,6 +157,9 @@ def detect(
         Number_of_free_cpus,
         # Classification_batch_size,
     )
+    for point in points:
+        point.x = point.x + Signal_image.corner_pixels[0][2]
+        point.y = point.y + Signal_image.corner_pixels[0][1]
 
     points, rejected = cells_to_array(points)
 
