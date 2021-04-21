@@ -26,9 +26,9 @@ def init(widget):
     widget.insert(0, widgets.Label(value="<h2>cellfinder</h2>"))
     widget.insert(1, widgets.Label(value="<h3>Cell detection</h3>"))
     widget.insert(2, widgets.Label(value="<b>Data:</b>"))
-    widget.insert(8, widgets.Label(value="<b>Detection:</b>"))
-    widget.insert(17, widgets.Label(value="<b>Classification:</b>"))
-    widget.insert(19, widgets.Label(value="<b>Misc:</b>"))
+    widget.insert(9, widgets.Label(value="<b>Detection:</b>"))
+    widget.insert(18, widgets.Label(value="<b>Classification:</b>"))
+    widget.insert(20, widgets.Label(value="<b>Misc:</b>"))
 
 
 @magic_factory(
@@ -41,12 +41,13 @@ def init(widget):
     Ball_overlap=dict(step=0.1),
     Filter_width=dict(step=0.1),
     Cell_spread=dict(step=0.1),
+    Max_cluster=dict(min=0, max=10000000),
     Start_plane=dict(min=0, max=100000),
     End_plane=dict(min=0, max=100000),
     # Classification_batch_size=dict(max=4096),
     call_button=True,
-    widget_init=init
-    # persist=True,
+    widget_init=init,
+    persist=True,
 )
 def detect(
     viewer: napari.Viewer,
