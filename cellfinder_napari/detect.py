@@ -158,9 +158,10 @@ def detect(
         Number_of_free_cpus,
         # Classification_batch_size,
     )
-    for point in points:
-        point.x = point.x + Signal_image.corner_pixels[0][2]
-        point.y = point.y + Signal_image.corner_pixels[0][1]
+    if Analyse_field_of_view:
+        for point in points:
+            point.x = point.x + Signal_image.corner_pixels[0][2]
+            point.y = point.y + Signal_image.corner_pixels[0][1]
 
     points, rejected = cells_to_array(points)
 
