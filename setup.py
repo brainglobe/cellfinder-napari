@@ -17,7 +17,7 @@ setup(
     name="cellfinder-napari",
     version="0.0.3-rc2",
     author="Adam Tyson",
-    author_email="adam.tyson@ucl.ac.uk",
+    author_email="code@adamltyson.com",
     license="GPL-3.0",
     description="Efficient cell detection in large images",
     long_description=long_description,
