@@ -21,6 +21,9 @@ CUBE_WIDTH = 50
 CUBE_HEIGHT = 20
 CUBE_DEPTH = 20
 
+# If using ROI, how much in z to analyse
+MIN_PLANES_ANALYSE = 10
+
 
 def init(widget):
     widget.insert(0, widgets.Label(value="<h2>cellfinder</h2>"))
@@ -121,12 +124,12 @@ def detect(
         index[0] = slice(0, len(Signal_image.data))
 
         signal_data = Signal_image.data[tuple(index)]
-        background_data = Signal_image.data[tuple(index)]
+        background_data = Background_image.data[tuple(index)]
 
         current_plane = viewer.dims.current_step[0]
 
         # so a reasonable number of cells in the plane are detected
-        planes_needed = 2 * int(
+        planes_needed = MIN_PLANES_ANALYSE + int(
             ceil((CUBE_DEPTH * NETWORK_VOXEL_SIZES[0]) / voxel_size_z)
         )
 
