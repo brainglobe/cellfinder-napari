@@ -226,9 +226,9 @@ class CurationWidget(QWidget):
 
     def add_training_data(
         self,
-        cell_name="Training data (cells)",
-        non_cell_name="Training data (non cells)",
     ):
+        cell_name = "Training data (cells)"
+        non_cell_name = "Training data (non cells)"
         if not (
             self.training_data_cell_layer and self.training_data_non_cell_layer
         ):
