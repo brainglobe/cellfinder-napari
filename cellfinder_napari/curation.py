@@ -234,7 +234,8 @@ class CurationWidget(QWidget):
         ):
             if not self.training_data_cell_layer:
                 self.training_data_cell_layer = self.viewer.add_points(
-                    np.empty((0, 3)),
+                    None,
+                    ndim=3,
                     symbol="ring",
                     n_dimensional=True,
                     size=15,
@@ -247,7 +248,8 @@ class CurationWidget(QWidget):
 
             if not self.training_data_non_cell_layer:
                 self.training_data_non_cell_layer = self.viewer.add_points(
-                    np.empty((0, 3)),
+                    None,
+                    ndim=3,
                     symbol="ring",
                     n_dimensional=True,
                     size=15,
@@ -296,13 +298,17 @@ class CurationWidget(QWidget):
                     else:
                         destination_layer = self.training_data_non_cell_layer
                     print(
-                        f"Adding {len(layer.data)} points to layer: "
-                        f"{destination_layer.name}"
+                        f"Adding {len(layer.selected_data)} "
+                        f"points to layer: {destination_layer.name}"
                     )
 
-                    destination_layer.data = np.vstack(
-                        (destination_layer.data, layer.data)
-                    )
+                    for selected_point in layer.selected_data:
+                        destination_layer.data = np.vstack(
+                            (
+                                destination_layer.data,
+                                layer.data[selected_point],
+                            )
+                        )
 
                 else:
                     display_info(
