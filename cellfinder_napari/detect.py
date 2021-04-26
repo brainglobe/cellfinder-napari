@@ -92,18 +92,38 @@ def detect():
             label="Voxel size (x)",
             step=0.1,
         ),
-        ball_xy_size=dict(label="Ball filter (xy)"),
-        ball_z_size=dict(label="Ball filter (z)"),
-        Soma_diameter=dict(step=0.1),
-        Ball_overlap=dict(step=0.1),
-        Filter_width=dict(step=0.1),
-        Cell_spread=dict(step=0.1),
-        Max_cluster=dict(min=0, max=10000000),
-        Start_plane=dict(min=0, max=100000),
-        End_plane=dict(min=0, max=100000),
+        Soma_diameter=dict(
+            value=DEFAULT_PARAMETERS["Soma_diameter"], step=0.1
+        ),
+        ball_xy_size=dict(
+            value=DEFAULT_PARAMETERS["ball_xy_size"], label="Ball filter (xy)"
+        ),
+        ball_z_size=dict(
+            value=DEFAULT_PARAMETERS["ball_z_size"], label="Ball filter (z)"
+        ),
+        Ball_overlap=dict(value=DEFAULT_PARAMETERS["Ball_overlap"], step=0.1),
+        Filter_width=dict(value=DEFAULT_PARAMETERS["Filter_width"], step=0.1),
+        Threshold=dict(value=DEFAULT_PARAMETERS["Threshold"], step=0.1),
+        Cell_spread=dict(value=DEFAULT_PARAMETERS["Cell_spread"], step=0.1),
+        Max_cluster=dict(
+            value=DEFAULT_PARAMETERS["Max_cluster"], min=0, max=10000000
+        ),
+        Trained_model=dict(value=DEFAULT_PARAMETERS["Trained_model"]),
+        Start_plane=dict(
+            value=DEFAULT_PARAMETERS["Start_plane"], min=0, max=100000
+        ),
+        End_plane=dict(
+            value=DEFAULT_PARAMETERS["End_plane"], min=0, max=100000
+        ),
+        Number_of_free_cpus=dict(
+            value=DEFAULT_PARAMETERS["Number_of_free_cpus"]
+        ),
+        Analyse_field_of_view=dict(
+            value=DEFAULT_PARAMETERS["Analyse_field_of_view"]
+        ),
+        Debug=dict(value=DEFAULT_PARAMETERS["Debug"]),
         # Classification_batch_size=dict(max=4096),
         call_button=True,
-        # widget_init=init,
         persist=True,
         reset_button=dict(widget_type="PushButton", text="Reset defaults"),
     )
@@ -134,7 +154,7 @@ def detect():
         Number_of_free_cpus: int,
         Analyse_field_of_view: bool,
         Debug: bool,
-        reset_button=None,
+        reset_button,
     ) -> List[napari.types.LayerDataTuple]:
         """
 
@@ -173,11 +193,6 @@ def detect():
         Analyse_field_of_view : Only analyse the visible part of the image,
             with the minimum amount of 3D information
         """
-        fancylog.start_logging(
-            package=program_for_log,
-            verbose=Debug,
-            log_to_file=False,
-        )
 
         def add_layers(points):
             if Analyse_field_of_view:
