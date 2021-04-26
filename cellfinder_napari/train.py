@@ -1,6 +1,7 @@
 from pathlib import Path
 from magicgui import magicgui
 from pkg_resources import resource_filename
+from napari.qt.threading import thread_worker
 
 
 brainglobe_logo = resource_filename(
@@ -9,7 +10,6 @@ brainglobe_logo = resource_filename(
 
 
 def train():
-    from cellfinder_core.train.train_yml import run as train_yml
     from cellfinder_core.download.models import model_weight_urls
     from cellfinder_core.train.train_yml import models
 
@@ -63,7 +63,9 @@ def train():
         YAML_files=dict(
             value=DEFAULT_PARAMETERS["YAML_files"], mode="rm", filter="*.yml"
         ),
-        Output_directory=dict(value=DEFAULT_PARAMETERS["Output_directory"]),
+        Output_directory=dict(
+            value=DEFAULT_PARAMETERS["Output_directory"], mode="d"
+        ),
         Trained_model=dict(value=DEFAULT_PARAMETERS["Trained_model"]),
         Model_weights=dict(value=DEFAULT_PARAMETERS["Model_weights"]),
         Model_depth=dict(
@@ -175,25 +177,26 @@ def train():
         if YAML_files[0] == Path.home():
             print("Please select a YAML file for training")
         else:
-            train_yml(
+            worker = run_training(
                 Output_directory,
                 YAML_files,
-                network_depth=Model_depth,
-                model=Pretrained_model,
-                trained_model=Trained_model,
-                model_weights=Model_weights,
-                no_augment=not Augment,
-                tensorboard=Tensorboard,
-                save_weights=Save_weights,
-                save_progress=Save_progress,
-                no_save_checkpoints=not Save_checkpoints,
-                n_free_cpus=Number_of_free_cpus,
-                continue_training=Continue_training,
-                test_fraction=Test_fraction,
-                epochs=Epochs,
-                learning_rate=Learning_rate,
-                batch_size=Batch_size,
+                Model_depth,
+                Pretrained_model,
+                Trained_model,
+                Model_weights,
+                Augment,
+                Tensorboard,
+                Save_weights,
+                Save_progress,
+                Save_checkpoints,
+                Number_of_free_cpus,
+                Continue_training,
+                Test_fraction,
+                Epochs,
+                Learning_rate,
+                Batch_size,
             )
+            worker.start()
 
     widget.header.value = (
         "<p>Efficient cell detection in large images.</p>"
@@ -210,3 +213,48 @@ def train():
             getattr(widget, name).value = value
 
     return widget
+
+
+@thread_worker
+def run_training(
+    Output_directory,
+    YAML_files,
+    Model_depth,
+    Pretrained_model,
+    Trained_model,
+    Model_weights,
+    Augment,
+    Tensorboard,
+    Save_weights,
+    Save_progress,
+    Save_checkpoints,
+    Number_of_free_cpus,
+    Continue_training,
+    Test_fraction,
+    Epochs,
+    Learning_rate,
+    Batch_size,
+):
+    from cellfinder_core.train.train_yml import run as train_yml
+
+    print("Running training")
+    train_yml(
+        Output_directory,
+        YAML_files,
+        network_depth=Model_depth,
+        model=Pretrained_model,
+        trained_model=Trained_model,
+        model_weights=Model_weights,
+        no_augment=not Augment,
+        tensorboard=Tensorboard,
+        save_weights=Save_weights,
+        save_progress=Save_progress,
+        no_save_checkpoints=not Save_checkpoints,
+        n_free_cpus=Number_of_free_cpus,
+        continue_training=Continue_training,
+        test_fraction=Test_fraction,
+        epochs=Epochs,
+        learning_rate=Learning_rate,
+        batch_size=Batch_size,
+    )
+    print("Finished!")
