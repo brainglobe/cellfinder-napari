@@ -4,9 +4,7 @@ from pathlib import Path
 
 
 from qtpy.QtWidgets import (
-    QPushButton,
     QLabel,
-    QComboBox,
     QWidget,
     QFileDialog,
     QGridLayout,
@@ -15,11 +13,10 @@ from qtpy.QtWidgets import (
 import tifffile
 from brainglobe_napari_io.cellfinder.utils import convert_layer_to_cells
 from imlib.cells.cells import Cell
-from imlib.general.system import get_sorted_file_paths, ensure_directory_exists
+from imlib.general.system import ensure_directory_exists
 from imlib.IO.yaml import save_yaml
 
-from .utils import add_combobox, add_button, display_info, display_question
-from cellfinder_core.classify.cube_generator import CubeGeneratorFromFile
+from .utils import add_combobox, add_button, display_info
 
 import napari
 
@@ -42,6 +39,7 @@ class CurationWidget(QWidget):
         save_empty_cubes=False,
         max_ram=None,
     ):
+
         super(CurationWidget, self).__init__()
 
         self.non_cells_to_extract = None
@@ -351,6 +349,10 @@ class CurationWidget(QWidget):
             self.status_label.setText("Ready")
 
     def extract_cubes(self):
+        from cellfinder_core.classify.cube_generator import (
+            CubeGeneratorFromFile,
+        )
+
         self.status_label.setText("Extracting cubes")
         self.convert_layers_to_cells()
         to_extract = {
