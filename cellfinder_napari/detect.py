@@ -2,6 +2,7 @@ import napari
 from pathlib import Path
 
 from magicgui import magicgui
+
 from typing import List
 from pkg_resources import resource_filename
 
@@ -31,6 +32,26 @@ def detect():
     from cellfinder_core.classify.cube_generator import get_cube_depth_min_max
     from .utils import cells_to_array
 
+    DEFAULT_PARAMETERS = dict(
+        voxel_size_z=5,
+        voxel_size_y=2,
+        voxel_size_x=2,
+        Soma_diameter=16.0,
+        ball_xy_size=6,
+        ball_z_size=15,
+        Ball_overlap=0.6,
+        Filter_width=0.2,
+        Threshold=10,
+        Cell_spread=1.4,
+        Max_cluster=100000,
+        Trained_model=Path.home(),
+        Start_plane=0,
+        End_plane=0,
+        Number_of_free_cpus=2,
+        Analyse_field_of_view=False,
+        Debug=False,
+    )
+
     @magicgui(
         header=dict(
             widget_type="Label",
@@ -56,9 +77,21 @@ def detect():
             widget_type="Label",
             label="<b>Misc:</b>",
         ),
-        voxel_size_z=dict(label="Voxel size (z)", step=0.1),
-        voxel_size_y=dict(label="Voxel size (y)", step=0.1),
-        voxel_size_x=dict(label="Voxel size (x)", step=0.1),
+        voxel_size_z=dict(
+            value=DEFAULT_PARAMETERS["voxel_size_z"],
+            label="Voxel size (z)",
+            step=0.1,
+        ),
+        voxel_size_y=dict(
+            value=DEFAULT_PARAMETERS["voxel_size_y"],
+            label="Voxel size (y)",
+            step=0.1,
+        ),
+        voxel_size_x=dict(
+            value=DEFAULT_PARAMETERS["voxel_size_x"],
+            label="Voxel size (x)",
+            step=0.1,
+        ),
         ball_xy_size=dict(label="Ball filter (xy)"),
         ball_z_size=dict(label="Ball filter (z)"),
         Soma_diameter=dict(step=0.1),
@@ -72,6 +105,7 @@ def detect():
         call_button=True,
         # widget_init=init,
         persist=True,
+        reset_button=dict(widget_type="PushButton", text="Reset defaults"),
     )
     def widget(
         header,
@@ -80,26 +114,27 @@ def detect():
         viewer: napari.Viewer,
         Signal_image: napari.layers.Image,
         Background_image: napari.layers.Image,
-        voxel_size_z: float = 5,
-        voxel_size_y: float = 2,
-        voxel_size_x: float = 2,
-        detection_options=None,
-        Soma_diameter: float = 16.0,
-        ball_xy_size: float = 6,
-        ball_z_size: float = 15,
-        Ball_overlap: float = 0.6,
-        Filter_width: float = 0.2,
-        Threshold: int = 10,
-        Cell_spread: float = 1.4,
-        Max_cluster: int = 100000,
-        classification_options=None,
-        Trained_model: Path = Path.home(),
-        misc_options=None,
-        Start_plane: int = 0,
-        End_plane: int = 0,
-        Number_of_free_cpus: int = 2,
-        Analyse_field_of_view: bool = False,
-        Debug: bool = False,
+        voxel_size_z: float,
+        voxel_size_y: float,
+        voxel_size_x: float,
+        detection_options,
+        Soma_diameter: float,
+        ball_xy_size: float,
+        ball_z_size: float,
+        Ball_overlap: float,
+        Filter_width: float,
+        Threshold: int,
+        Cell_spread: float,
+        Max_cluster: int,
+        classification_options,
+        Trained_model: Path,
+        misc_options,
+        Start_plane: int,
+        End_plane: int,
+        Number_of_free_cpus: int,
+        Analyse_field_of_view: bool,
+        Debug: bool,
+        reset_button=None,
     ) -> List[napari.types.LayerDataTuple]:
         """
 
@@ -275,4 +310,10 @@ def detect():
         '<p><a href="https://www.biorxiv.org/content/10.1101/2020.10.21.348771v2" style="color:gray;">Citation</a></p>'
     )
     widget.header.native.setOpenExternalLinks(True)
+
+    @widget.reset_button.changed.connect
+    def restore_defaults(event=None):
+        for name, value in DEFAULT_PARAMETERS.items():
+            getattr(widget, name).value = value
+
     return widget
