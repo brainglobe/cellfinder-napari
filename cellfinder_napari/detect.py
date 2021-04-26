@@ -24,19 +24,17 @@ brainglobe_logo = resource_filename(
 
 def detect():
     from math import ceil
+    from fancylog import fancylog
     from napari.qt.threading import thread_worker
+    import cellfinder_napari as program_for_log
     from cellfinder_core.main import main as cellfinder_run
     from cellfinder_core.classify.cube_generator import get_cube_depth_min_max
     from .utils import cells_to_array
 
     @magicgui(
-        logo=dict(
+        header=dict(
             widget_type="Label",
-            label=f'<img src="{brainglobe_logo}" width="100">',
-        ),
-        header_label=dict(
-            widget_type="Label",
-            label="<h2>cellfinder</h2>",
+            label=f'<h1><img src="{brainglobe_logo}"width="100">cellfinder</h1>',
         ),
         detection_label=dict(
             widget_type="Label",
@@ -76,8 +74,7 @@ def detect():
         persist=True,
     )
     def widget(
-        logo,
-        header_label,
+        header,
         detection_label,
         data_options,
         viewer: napari.Viewer,
@@ -102,6 +99,7 @@ def detect():
         End_plane: int = 0,
         Number_of_free_cpus: int = 2,
         Analyse_field_of_view: bool = False,
+        Debug: bool = False,
     ) -> List[napari.types.LayerDataTuple]:
         """
 
@@ -140,6 +138,11 @@ def detect():
         Analyse_field_of_view : Only analyse the visible part of the image,
             with the minimum amount of 3D information
         """
+        fancylog.start_logging(
+            package=program_for_log,
+            verbose=Debug,
+            log_to_file=False,
+        )
 
         def add_layers(points):
             if Analyse_field_of_view:
@@ -264,4 +267,12 @@ def detect():
         worker.returned.connect(add_layers)
         worker.start()
 
+    widget.header.value = (
+        "<p>Efficient cell detection in large images.</p>"
+        '<p><a href="https://cellfinder.info" style="color:gray;">Website</a></p>'
+        '<p><a href="https://docs.brainglobe.info/cellfinder/napari-plugin" style="color:gray;">Documentation</a></p>'
+        '<p><a href="https://github.com/brainglobe/cellfinder-napari" style="color:gray;">Source</a></p>'
+        '<p><a href="https://www.biorxiv.org/content/10.1101/2020.10.21.348771v2" style="color:gray;">Citation</a></p>'
+    )
+    widget.header.native.setOpenExternalLinks(True)
     return widget
