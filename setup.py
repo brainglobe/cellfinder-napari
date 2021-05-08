@@ -35,6 +35,7 @@ setup(
             "bump2version",
             "pre-commit",
             "flake8",
+            "check-manifest",
         ]
     },
     url="https://cellfinder.info",
