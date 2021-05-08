@@ -8,7 +8,6 @@ on: push
 jobs:
   manifest:
     name: Check Manifest
-    needs: code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
