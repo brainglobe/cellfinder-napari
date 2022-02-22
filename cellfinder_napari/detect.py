@@ -1,6 +1,6 @@
 from math import ceil
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import napari
 from cellfinder_core.classify.cube_generator import get_cube_depth_min_max
@@ -95,7 +95,7 @@ def detect():
         cell_spread: float,
         max_cluster: int,
         classification_options,
-        trained_model: Path,
+        trained_model: Optional[Path],
         misc_options,
         start_plane: int,
         end_plane: int,
@@ -136,7 +136,7 @@ def detect():
         max_cluster : int
             Largest putative cell cluster (in cubic um) where splitting
             should be attempted
-        trained_model : Path
+        trained_model : Optional[Path]
             Trained model file path (home directory (default) -> pretrained weights)
         start_plane : int
             First plane to process (to process a subset of the data)
