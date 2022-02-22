@@ -1,5 +1,6 @@
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Optional
 
 import napari
 from cellfinder_core.main import main as cellfinder_run
@@ -102,7 +103,7 @@ class DetectionInputs(InputContainer):
 class ClassificationInputs(InputContainer):
     """Container for classification inputs."""
 
-    trained_model: Path
+    trained_model: Optional[Path]
 
     persistent_defaults = dict(trained_model=Path.home())
 
