@@ -38,6 +38,9 @@ jobs:
         python-version: [3.7, 3.8]
 
     steps:
+      # Setup pyqt libraries
+      - uses: tlambert03/setup-qt-libs@v1
+      # Run tests
       - uses: brainglobe/actions/test@main
         with:
           python-version: ${{ matrix.python-version }}
