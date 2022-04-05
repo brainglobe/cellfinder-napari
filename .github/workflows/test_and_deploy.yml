@@ -9,14 +9,14 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: brainglobe/actions/lint@main
+      - uses: brainglobe/actions/lint@v1
 
   manifest:
     needs: linting
     name: Check Manifest
     runs-on: ubuntu-latest
     steps:
-      - uses: brainglobe/actions/check_manifest@main
+      - uses: brainglobe/actions/check_manifest@v1
 
   test:
     needs: manifest
@@ -31,7 +31,7 @@ jobs:
       # Setup pyqt libraries
       - uses: tlambert03/setup-qt-libs@v1
       # Run tests
-      - uses: brainglobe/actions/test@main
+      - uses: brainglobe/actions/test@v1
         with:
           python-version: ${{ matrix.python-version }}
 
