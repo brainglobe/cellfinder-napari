@@ -50,10 +50,10 @@ class Worker(WorkerBase):
                 plane + 1,
             )
 
-        def detect_finished_callback(points: list):
+        def detect_finished_callback(points: list) -> None:
             self.npoints_detected = len(points)
 
-        def classify_callback(batch: int):
+        def classify_callback(batch: int) -> None:
             self.update_progress_bar.emit(
                 "Classifying cells",
                 # Default cellfinder-core batch size is 32. This seems to give

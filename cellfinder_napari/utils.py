@@ -20,14 +20,16 @@ brainglobe_logo = resource_filename(
 
 
 def html_label_widget(label: str, tag: str = "b") -> dict:
-    """Create a HMTL label for use with magicgui."""
+    """
+    Create a HMTL label for use with magicgui.
+    """
     return dict(
         widget_type="Label",
         label=f"<{tag}>{label}</{tag}>",
     )
 
 
-def add_layers(points, viewer: napari.Viewer):
+def add_layers(points, viewer: napari.Viewer) -> None:
     """
     Adds classified cell candidates as two separate point layers to the napari viewer.
     """
@@ -142,7 +144,7 @@ def add_button(
     return button
 
 
-def display_info(widget: QWidget, title: str, message: str):
+def display_info(widget: QWidget, title: str, message: str) -> None:
     """
     Display a warning in a pop up that informs
     about overwriting files
@@ -150,7 +152,7 @@ def display_info(widget: QWidget, title: str, message: str):
     QMessageBox.information(widget, title, message, QMessageBox.Ok)
 
 
-def display_error_box(message: str):
+def display_error_box(message: str) -> None:
     """
     Display a pop up window with an error.
     """
@@ -162,8 +164,7 @@ def display_error_box(message: str):
 
 def display_question(widget: QWidget, title: str, message: str) -> bool:
     """
-    Display a warning in a pop up that informs
-    about overwriting files
+    Display a warning in a pop up that informs about overwriting files.
     """
     message_reply = QMessageBox.question(
         widget,
