@@ -1,5 +1,5 @@
-from cellfinder_napari.curation import CurationWidget
 from cellfinder_napari import sample_data
+from cellfinder_napari.curation import CurationWidget
 
 
 def test_detect_function(make_napari_viewer):
