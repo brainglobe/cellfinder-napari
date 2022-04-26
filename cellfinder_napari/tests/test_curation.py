@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from napari.layers import Points
 
@@ -29,3 +30,35 @@ def test_add_new_training_layers(curation_widget):
 
     assert layers[0].name == "Training data (cells)"
     assert layers[1].name == "Training data (non cells)"
+
+
+def test_cell_marking(curation_widget):
+    """
+    Check that marking cells and non-cells works as expected.
+    """
+    widget = curation_widget
+    widget.add_training_data()
+    viewer = widget.viewer
+
+    training_layers = [
+        widget.training_data_cell_layer,
+        widget.training_data_non_cell_layer,
+    ]
+    for layer in training_layers:
+        # Check that no cells have been marked yet
+        assert layer.data.shape == (0, 3)
+
+    # Add a points layer to select points from
+    points = Points(np.array([[0, 1, 2], [3, 4, 5]]), name="selection_points")
+    # Adding the layer automatically selects it in the layer list
+    viewer.add_layer(points)
+
+    points.selected_data = [0]
+    curation_widget.mark_as_cell()
+    assert np.array_equal(training_layers[0].data, np.array([[0, 1, 2]]))
+    assert np.array_equal(training_layers[1].data, np.zeros((0, 3)))
+
+    points.selected_data = [1]
+    curation_widget.mark_as_non_cell()
+    assert np.array_equal(training_layers[0].data, np.array([[0, 1, 2]]))
+    assert np.array_equal(training_layers[1].data, np.array([[3, 4, 5]]))
