@@ -25,8 +25,7 @@ def test_add_new_training_layers(curation_widget):
     curation_widget.add_training_data()
     assert len(layers) == 2
 
-    for layer in layers:
-        assert isinstance(layer, Points)
+    assert all(isinstance(layer, Points) for layer in layers)
 
     assert layers[0].name == "Training data (cells)"
     assert layers[1].name == "Training data (non cells)"
