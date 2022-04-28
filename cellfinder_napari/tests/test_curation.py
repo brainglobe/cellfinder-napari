@@ -40,13 +40,13 @@ def test_cell_marking(curation_widget):
     widget.add_training_data()
     viewer = widget.viewer
 
-    training_layers = [
-        widget.training_data_cell_layer,
-        widget.training_data_non_cell_layer,
-    ]
-    for layer in training_layers:
-        # Check that no cells have been marked yet
-        assert layer.data.shape == (0, 3)
+    cell_layer = widget.training_data_cell_layer
+    non_cell_layer = widget.training_data_non_cell_layer
+
+    # Check that no cells have been marked yet
+    assert all(
+        layer.data.shape == (0, 3) for layer in [cell_layer, non_cell_layer]
+    )
 
     # Add a points layer to select points from
     points = Points(np.array([[0, 1, 2], [3, 4, 5]]), name="selection_points")
@@ -55,10 +55,10 @@ def test_cell_marking(curation_widget):
 
     points.selected_data = [0]
     curation_widget.mark_as_cell()
-    assert np.array_equal(training_layers[0].data, np.array([[0, 1, 2]]))
-    assert np.array_equal(training_layers[1].data, np.zeros((0, 3)))
+    assert np.array_equal(cell_layer.data, np.array([[0, 1, 2]]))
+    assert non_cell_layer.data.shape[0] == 0
 
     points.selected_data = [1]
     curation_widget.mark_as_non_cell()
-    assert np.array_equal(training_layers[0].data, np.array([[0, 1, 2]]))
-    assert np.array_equal(training_layers[1].data, np.array([[3, 4, 5]]))
+    assert np.array_equal(cell_layer.data, np.array([[0, 1, 2]]))
+    assert np.array_equal(non_cell_layer.data, np.array([[3, 4, 5]]))
