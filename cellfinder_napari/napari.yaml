@@ -14,6 +14,10 @@ contributions:
     title: Create Curation
     python_name: cellfinder_napari.curation:CurationWidget
 
+  - id: cellfinder-napari.transform
+    title: Create Transform
+    python_name: cellfinder_napari.transform:get_transform_widget
+
   - id: cellfinder-napari.SampleData
     title: Sample data
     python_name: cellfinder_napari.sample_data:load_sample
@@ -25,6 +29,8 @@ contributions:
     display_name: Train network
   - command: cellfinder-napari.CurationWidget
     display_name: Curation
+  - command: cellfinder-napari.transform
+    display_name: Transform
 
   sample_data:
   - key: sample
