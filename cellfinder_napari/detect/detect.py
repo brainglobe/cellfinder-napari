@@ -219,7 +219,5 @@ def detect() -> FunctionGui:
     widget.insert(-3, progress_bar)
 
     scroll = QScrollArea()
-    scroll.setWidget(widget._widget._qwidget)
-    widget._widget._qwidget = scroll
-
-    return widget
+    scroll.setWidget(widget.native)
+    return scroll
