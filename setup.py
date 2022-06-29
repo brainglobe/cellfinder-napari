@@ -13,6 +13,7 @@ requirements = [
     "brainglobe-napari-io",
     "brainreg-napari>=0.0.5rc0",
     "cellfinder-core>=0.3",
+    "cellfinder>=0.4.0",
     "pooch>=1",  # For downloading sample data
 ]
 
