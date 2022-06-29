@@ -7,8 +7,19 @@ from napari.layers import Layer, Points
 
 from cellfinder_napari.transform import transform
 
+BRAINREG_OUTPUT_DIRECTORY = (
+    Path(__file__).parent / "data" / "brainreg-napari-output"
+)
+
 
 def test_transform(make_napari_viewer):
+    """
+    Check that transforming cells to a registered brain works.
+
+    Note that the final check for the new coordinates of the cell has not yet
+    been checked for correctness, but is included to catch changes in the cell
+    transformation code in the future.
+    """
     # Create cells
     cells_layer = Points(np.atleast_2d([0, 0, 0]))
 
@@ -19,7 +30,7 @@ def test_transform(make_napari_viewer):
     viewer = make_napari_viewer()
 
     labels_layer, boundaries_layer = add_registered_image_layers(
-        viewer, registration_directory=Path.home() / "brainreg-napari-output"
+        viewer, registration_directory=BRAINREG_OUTPUT_DIRECTORY
     )
     viewer.add_layer(brain_layer)
     viewer.add_layer(cells_layer)
