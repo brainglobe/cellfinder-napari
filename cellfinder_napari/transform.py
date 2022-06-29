@@ -14,6 +14,13 @@ from magicgui import magicgui
 from napari.layers import Image, Labels, Points
 from napari.utils.notifications import show_info
 
+# An internal flag to allow the deformation field files to be
+# set in the tests, instead of being read in from a metadata file.
+#
+# Required because the deformation field files do not have a fixed
+# absolute path when testing across different machines.
+_DEFORMATION_FIELD_DIRECTORY: Optional[Path] = None
+
 
 @magicgui(call_button=True)
 def transform(
@@ -54,7 +61,10 @@ def transform(
         resolution=registered_brain.scale,
     )
 
-    reg_dir = Path(reg_meta["registration_output_folder"])
+    if _DEFORMATION_FIELD_DIRECTORY is None:
+        reg_dir = Path(reg_meta["registration_output_folder"])
+    else:
+        reg_dir = _DEFORMATION_FIELD_DIRECTORY
     deformation_field_paths = [
         str(reg_dir / f"deformation_field_{i}.tiff") for i in [0, 1, 2]
     ]
