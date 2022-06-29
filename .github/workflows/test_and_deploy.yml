@@ -35,6 +35,9 @@ jobs:
           python-version: "3.10"
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
       # Setup pyqt libraries
       - uses: tlambert03/setup-qt-libs@v1
       # Run tests
