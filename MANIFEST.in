@@ -10,4 +10,4 @@ exclude .pre-commit-config.yaml
 exclude tox.ini
 
 recursive-exclude examples *
-recursive-exclude resources *
+recursive-exclude cellfinder_napari/tests/data *
