@@ -107,7 +107,7 @@ class ClassificationInputs(InputContainer):
     """Container for classification inputs."""
 
     use_pre_trained_weights: bool = True
-    trained_model: Optional[Path] = Path.home()
+    trained_model: Optional[Path] = None
 
     def as_core_arguments(self) -> dict:
         args = super().as_core_arguments()

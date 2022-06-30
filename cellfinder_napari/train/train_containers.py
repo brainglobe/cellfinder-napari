@@ -43,8 +43,8 @@ class TrainingDataInputs(InputContainer):
 class OptionalNetworkInputs(InputContainer):
     """Container for Optional Network input widgets"""
 
-    trained_model: Optional[Path] = Path.home()
-    model_weights: Optional[Path] = Path.home()
+    trained_model: Optional[Path] = None
+    model_weights: Optional[Path] = None
     model_depth: str = list(models.keys())[2]
     pretrained_model: str = str(list(model_weight_urls.keys())[0])
 

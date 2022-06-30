@@ -123,9 +123,6 @@ def training_widget() -> FunctionGui:
         reset_button : PushButton
             Reset parameters to default
         """
-        trained_model = None if trained_model == Path.home() else trained_model
-        model_weights = None if model_weights == Path.home() else model_weights
-
         training_data_inputs = TrainingDataInputs(yaml_files, output_directory)
 
         optional_network_inputs = OptionalNetworkInputs(
