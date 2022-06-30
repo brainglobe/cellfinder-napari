@@ -147,7 +147,7 @@ def training_widget() -> FunctionGui:
 
         misc_training_inputs = MiscTrainingInputs(number_of_free_cpus)
 
-        if yaml_files[0] == Path.home():  # type: ignore
+        if not yaml_files:
             show_info("Please select a YAML file for training")
         else:
             worker = run_training(

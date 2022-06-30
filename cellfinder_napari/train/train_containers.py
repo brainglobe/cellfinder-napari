@@ -14,8 +14,8 @@ from cellfinder_napari.utils import html_label_widget
 class TrainingDataInputs(InputContainer):
     """Container for Training Data input widgets"""
 
-    yaml_files: Path = Path.home()
-    output_directory: Path = Path.home()
+    yaml_files: Optional[Path] = None
+    output_directory: Optional[Path] = None
 
     def as_core_arguments(self) -> dict:
         arguments = super().as_core_arguments()
