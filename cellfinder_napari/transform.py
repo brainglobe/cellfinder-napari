@@ -2,13 +2,10 @@
 Widget to allow transformation of detected cells from the source space to a
 registered atlas space.
 """
-from glob import glob
 from pathlib import Path
 from typing import Optional
 
 import bg_space as bgs
-import napari
-from bg_atlasapi import BrainGlobeAtlas
 from cellfinder.analyse.analyse import transform_points_to_atlas_space
 from magicgui import magicgui
 from napari.layers import Image, Labels, Points
