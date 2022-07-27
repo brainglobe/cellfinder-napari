@@ -35,8 +35,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          lfs: true
       # Setup pyqt libraries
       - uses: tlambert03/setup-qt-libs@v1
       # Run tests
