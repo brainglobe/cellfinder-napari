@@ -21,7 +21,7 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
-from .utils import add_button, add_combobox, display_question, add_spinbox
+from .utils import add_button, add_combobox, add_spinbox, display_question
 
 # Constants used throughout
 WINDOW_HEIGHT = 750
@@ -189,8 +189,8 @@ class CurationWidget(QWidget):
             self.load_data_layout,
             "Cube Height",
             self.set_cube_height_voxel_size,
-            6,          
-        )        
+            6,
+        )
         self.cube_depth_voxel_size, _ = add_spinbox(
             self.load_data_layout,
             "Cube Depth",
@@ -268,13 +268,15 @@ class CurationWidget(QWidget):
             self.training_data_non_cell_layer.metadata[
                 "point_type"
             ] = Cell.UNKNOWN
-            self.training_data_non_cell_layer.metadata["training_data"] = True 
+            self.training_data_non_cell_layer.metadata["training_data"] = True
 
-    def set_cube_width_voxel_size(self,):
-        '''
+    def set_cube_width_voxel_size(
+        self,
+    ):
+        """
         Sets the Cube Height in Voxels for Training Data
-        '''
-        value = self.cube_width_voxel_size.value()        
+        """
+        value = self.cube_width_voxel_size.value()
 
         if is_even(value):
             self.cube_width = value
@@ -283,13 +285,15 @@ class CurationWidget(QWidget):
                 "Value entered is invalid. "
                 "Please enter an even value between [2-50].",
             )
-            self.cube_width_voxel_size.setValue(50)   
+            self.cube_width_voxel_size.setValue(50)
 
-    def set_cube_height_voxel_size(self,):
-        '''
+    def set_cube_height_voxel_size(
+        self,
+    ):
+        """
         Sets the Cube Width in Voxels for Training Data
-        '''
-        value = self.cube_height_voxel_size.value()        
+        """
+        value = self.cube_height_voxel_size.value()
 
         if is_even(value):
             self.cube_height = value
@@ -299,12 +303,14 @@ class CurationWidget(QWidget):
                 "Please enter an even value between [2-50].",
             )
             self.cube_height_voxel_size.setValue(50)
-        
-    def set_cube_depth_voxel_size(self,):
-        '''
+
+    def set_cube_depth_voxel_size(
+        self,
+    ):
+        """
         Sets the Cube Depth in Voxels for Training Data
-        '''
-        value = self.cube_depth_voxel_size.value()        
+        """
+        value = self.cube_depth_voxel_size.value()
 
         if is_even(value):
             self.cube_depth = value
@@ -313,7 +319,7 @@ class CurationWidget(QWidget):
                 "Value entered is invalid. "
                 "Please enter an even value between [2-20].",
             )
-            self.cube_depth_voxel_size.setValue(20)           
+            self.cube_depth_voxel_size.setValue(20)
 
     def add_training_data(self):
         cell_name = "Training data (cells)"

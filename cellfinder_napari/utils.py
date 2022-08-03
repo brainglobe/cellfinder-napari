@@ -11,8 +11,8 @@ from qtpy.QtWidgets import (
     QLayout,
     QMessageBox,
     QPushButton,
-    QWidget,
     QSpinBox,
+    QWidget,
 )
 
 brainglobe_logo = resource_filename(
@@ -135,6 +135,7 @@ def add_combobox(
     layout.addWidget(combobox, combobox_row, combobox_column)
     return combobox, combobox_label
 
+
 def add_spinbox(
     layout: QLayout,
     label: str,
@@ -144,9 +145,9 @@ def add_spinbox(
     label_stack: bool = False,
     width: int = 150,
 ) -> QSpinBox:
-    '''
+    """
     Defines the properties for the SpinBox Widget.
-    '''
+    """
     if label_stack:
         spinbox_row = row + 1
         spinbox_column = column
@@ -171,6 +172,7 @@ def add_spinbox(
     spinbox.valueChanged.connect(connected_function)
     layout.addWidget(spinbox, spinbox_row, spinbox_column)
     return spinbox, spinbox_label
+
 
 def add_button(
     label: str,
