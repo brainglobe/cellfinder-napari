@@ -6,6 +6,7 @@ import numpy as np
 import tifffile
 from brainglobe_napari_io.cellfinder.utils import convert_layer_to_cells
 from imlib.cells.cells import Cell
+from imlib.general.numerical import is_even
 from imlib.IO.yaml import save_yaml
 from magicgui.widgets import ProgressBar
 from napari.qt.threading import thread_worker
@@ -20,7 +21,7 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
-from .utils import add_button, add_combobox, display_question
+from .utils import add_button, add_combobox, display_question, add_spinbox
 
 # Constants used throughout
 WINDOW_HEIGHT = 750
@@ -178,30 +179,48 @@ class CurationWidget(QWidget):
             4,
             callback=self.set_training_data_non_cell,
         )
+        self.cube_width_voxel_size, _ = add_spinbox(
+            self.load_data_layout,
+            "Cube Width",
+            self.set_cube_width_voxel_size,
+            5,
+        )
+        self.cube_height_voxel_size, _ = add_spinbox(
+            self.load_data_layout,
+            "Cube Height",
+            self.set_cube_height_voxel_size,
+            6,          
+        )        
+        self.cube_depth_voxel_size, _ = add_spinbox(
+            self.load_data_layout,
+            "Cube Depth",
+            self.set_cube_depth_voxel_size,
+            7,
+        )
         self.mark_as_cell_button = add_button(
             "Mark as cell(s)",
             self.load_data_layout,
             self.mark_as_cell,
-            5,
+            8,
         )
         self.mark_as_non_cell_button = add_button(
             "Mark as non cell(s)",
             self.load_data_layout,
             self.mark_as_non_cell,
-            5,
+            8,
             column=1,
         )
         self.add_training_data_button = add_button(
             "Add training data layers",
             self.load_data_layout,
             self.add_training_data,
-            6,
+            9,
         )
         self.save_training_data_button = add_button(
             "Save training data",
             self.load_data_layout,
             self.save_training_data,
-            6,
+            9,
             column=1,
         )
         self.load_data_layout.setColumnMinimumWidth(0, COLUMN_WIDTH)
@@ -249,7 +268,52 @@ class CurationWidget(QWidget):
             self.training_data_non_cell_layer.metadata[
                 "point_type"
             ] = Cell.UNKNOWN
-            self.training_data_non_cell_layer.metadata["training_data"] = True
+            self.training_data_non_cell_layer.metadata["training_data"] = True 
+
+    def set_cube_width_voxel_size(self,):
+        '''
+        Sets the Cube Height in Voxels for Training Data
+        '''
+        value = self.cube_width_voxel_size.value()        
+
+        if is_even(value):
+            self.cube_width = value
+        else:
+            show_info(
+                "Value entered is invalid. "
+                "Please enter an even value between [2-50].",
+            )
+            self.cube_width_voxel_size.setValue(50)   
+
+    def set_cube_height_voxel_size(self,):
+        '''
+        Sets the Cube Width in Voxels for Training Data
+        '''
+        value = self.cube_height_voxel_size.value()        
+
+        if is_even(value):
+            self.cube_height = value
+        else:
+            show_info(
+                "Value entered is invalid. "
+                "Please enter an even value between [2-50].",
+            )
+            self.cube_height_voxel_size.setValue(50)
+        
+    def set_cube_depth_voxel_size(self,):
+        '''
+        Sets the Cube Depth in Voxels for Training Data
+        '''
+        value = self.cube_depth_voxel_size.value()        
+
+        if is_even(value):
+            self.cube_depth = value
+        else:
+            show_info(
+                "Value entered is invalid. "
+                "Please enter an even value between [2-20].",
+            )
+            self.cube_depth_voxel_size.setValue(20)           
 
     def add_training_data(self):
         cell_name = "Training data (cells)"

@@ -12,6 +12,7 @@ from qtpy.QtWidgets import (
     QMessageBox,
     QPushButton,
     QWidget,
+    QSpinBox,
 )
 
 brainglobe_logo = resource_filename(
@@ -134,6 +135,42 @@ def add_combobox(
     layout.addWidget(combobox, combobox_row, combobox_column)
     return combobox, combobox_label
 
+def add_spinbox(
+    layout: QLayout,
+    label: str,
+    connected_function: Callable,
+    row: int,
+    column: int = 0,
+    label_stack: bool = False,
+    width: int = 150,
+) -> QSpinBox:
+    '''
+    Defines the properties for the SpinBox Widget.
+    '''
+    if label_stack:
+        spinbox_row = row + 1
+        spinbox_column = column
+    else:
+        spinbox_row = row
+        spinbox_column = column + 1
+    spinbox = QSpinBox()
+    spinbox.setSingleStep(2)
+    spinbox.setMaximumWidth = width
+    spinbox.setKeyboardTracking(False)
+
+    spinbox_label = QLabel(label)
+    spinbox.setMaximumWidth = width
+    if label == "Cube Depth":
+        spinbox.setValue(20)
+        spinbox.setRange(1, 20)
+    else:
+        spinbox.setValue(50)
+        spinbox.setRange(1, 50)
+    layout.addWidget(spinbox_label, row, column)
+
+    spinbox.valueChanged.connect(connected_function)
+    layout.addWidget(spinbox, spinbox_row, spinbox_column)
+    return spinbox, spinbox_label
 
 def add_button(
     label: str,
