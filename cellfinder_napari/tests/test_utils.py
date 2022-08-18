@@ -2,7 +2,13 @@ import pytest
 from imlib.cells.cells import Cell
 from qtpy.QtWidgets import QGridLayout
 
-from ..utils import add_button, add_combobox, add_layers, html_label_widget
+from ..utils import (
+    add_button,
+    add_combobox,
+    add_layers,
+    add_spinbox,
+    html_label_widget,
+)
 
 
 def test_add_layers(make_napari_viewer):
@@ -39,6 +45,23 @@ def test_add_combobox(label, label_stack):
         label_stack=label_stack,
     )
     assert combobox is not None
+
+
+@pytest.mark.parametrize("label_stack", [True, False])
+@pytest.mark.parametrize("label", ["A label", None])
+def test_add_spinbox(label, label_stack):
+    """
+    Smoke tests for add_spinbox for all conditional branches
+    """
+    layout = QGridLayout()
+    spinbox = add_spinbox(
+        layout=layout,
+        connected_function=lambda: None,
+        label=label,
+        row=0,
+        label_stack=label_stack,
+    )
+    assert spinbox is not None
 
 
 @pytest.mark.parametrize(

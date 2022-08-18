@@ -163,10 +163,10 @@ def add_spinbox(
     spinbox.setMaximumWidth = width
     if label == "Cube Depth":
         spinbox.setValue(20)
-        spinbox.setRange(1, 20)
+        spinbox.setRange(1, 1000000)
     else:
         spinbox.setValue(50)
-        spinbox.setRange(1, 50)
+        spinbox.setRange(1, 1000000)
     layout.addWidget(spinbox_label, row, column)
 
     spinbox.valueChanged.connect(connected_function)
