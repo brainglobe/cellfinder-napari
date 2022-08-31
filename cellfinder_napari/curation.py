@@ -274,7 +274,7 @@ class CurationWidget(QWidget):
         self,
     ):
         """
-        Sets the Cube Height in Voxels for Training Data
+        Sets the Cube Width in Voxels for Training Data
         """
         value = self.cube_width_voxel_size.value()
 
@@ -283,7 +283,7 @@ class CurationWidget(QWidget):
         else:
             show_info(
                 "Value entered is invalid. "
-                "Please enter an even value between [2-50].",
+                "Please enter an even positive value.",
             )
             self.cube_width_voxel_size.setValue(50)
 
@@ -291,7 +291,7 @@ class CurationWidget(QWidget):
         self,
     ):
         """
-        Sets the Cube Width in Voxels for Training Data
+        Sets the Cube Height in Voxels for Training Data
         """
         value = self.cube_height_voxel_size.value()
 
@@ -300,7 +300,7 @@ class CurationWidget(QWidget):
         else:
             show_info(
                 "Value entered is invalid. "
-                "Please enter an even value between [2-50].",
+                "Please enter an even positive value.",
             )
             self.cube_height_voxel_size.setValue(50)
 
@@ -317,7 +317,7 @@ class CurationWidget(QWidget):
         else:
             show_info(
                 "Value entered is invalid. "
-                "Please enter an even value between [2-20].",
+                "Please enter an even positive value.",
             )
             self.cube_depth_voxel_size.setValue(20)
 
