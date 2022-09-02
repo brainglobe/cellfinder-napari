@@ -38,6 +38,7 @@ def test_add_new_training_layers(curation_widget):
     assert layers[0].name == "Training data (cells)"
     assert layers[1].name == "Training data (non cells)"
 
+
 def test_set_cube_size(curation_widget):
     """
     Check setting cube size with even value works as expected.
@@ -53,7 +54,7 @@ def test_set_cube_size(curation_widget):
     widget.cube_width_voxel_size.setValue(40)
     widget.set_cube_width_voxel_size()
     assert widget.cube_width == 40
-    
+
     # Check setting value for cube height
     widget.cube_height_voxel_size.setValue(40)
     widget.set_cube_height_voxel_size()
@@ -69,7 +70,7 @@ def test_check_incorrect_cube_size(curation_widget):
     """
     Check for error if cube size is odd value.
     """
-    widget = curation_widget 
+    widget = curation_widget
 
     with patch("cellfinder_napari.curation.show_info") as show_info:
         widget.cube_width_voxel_size.setValue(41)
@@ -79,8 +80,7 @@ def test_check_incorrect_cube_size(curation_widget):
         widget.cube_depth_voxel_size.setValue(9)
         widget.set_cube_depth_voxel_size()
         show_info.assert_called_with(
-            "Value entered is invalid. "
-            "Please enter an even positive value."
+            "Value entered is invalid. " "Please enter an even positive value."
         )
 
 
