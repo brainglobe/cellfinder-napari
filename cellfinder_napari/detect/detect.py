@@ -50,6 +50,7 @@ def detect_widget() -> FunctionGui:
         call_button=True,
         persist=True,
         reset_button=dict(widget_type="PushButton", text="Reset defaults"),
+        scrollable=True
     )
     def widget(
         header,
@@ -224,8 +225,5 @@ def detect_widget() -> FunctionGui:
     # Insert progress bar before the run and reset buttons
     widget.insert(-3, progress_bar)
 
-    scroll = QScrollArea()
-    scroll.setWidget(widget._widget._qwidget)
-    widget._widget._qwidget = scroll
 
     return widget
