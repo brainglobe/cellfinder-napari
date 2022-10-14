@@ -38,7 +38,6 @@ jobs:
       - uses: tlambert03/setup-qt-libs@v1
       # Run tests
       - uses: brainglobe/actions/test@v1
-      - run: pip install napari --pre # temp workaround, to be removed.
         with:
           python-version: ${{ matrix.python-version }}
 
