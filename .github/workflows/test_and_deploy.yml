@@ -22,7 +22,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
         # Run across a mixture of Python versions and operating systems
         include:
         - os: ubuntu-latest
