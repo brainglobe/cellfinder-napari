@@ -18,7 +18,6 @@ jobs:
       - uses: brainglobe/actions/check_manifest@v1
 
   test:
-    needs: [linting, manifest]
     name: ${{ matrix.os }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
