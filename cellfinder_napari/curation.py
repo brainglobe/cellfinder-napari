@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 import napari
 import numpy as np
@@ -40,7 +40,6 @@ class CurationWidget(QWidget):
         save_empty_cubes: bool = False,
         max_ram=None,
     ):
-
         super(CurationWidget, self).__init__()
 
         self.non_cells_to_extract = None
@@ -143,7 +142,6 @@ class CurationWidget(QWidget):
         self.setLayout(self.layout)
 
     def add_loading_panel(self, row: int, column: int = 0):
-
         self.load_data_panel = QGroupBox("Load data")
         self.load_data_layout = QGridLayout()
         self.load_data_layout.setSpacing(15)
@@ -278,7 +276,6 @@ class CurationWidget(QWidget):
             self._add_training_data_layers(cell_name, non_cell_name)
 
     def _add_training_data_layers(self, cell_name: str, non_cell_name: str):
-
         self.training_data_cell_layer = self.viewer.add_points(
             None,
             ndim=3,
@@ -324,7 +321,6 @@ class CurationWidget(QWidget):
         if len(self.viewer.layers.selection) == 1:
             layer = list(self.viewer.layers.selection)[0]
             if type(layer) == napari.layers.Points:
-
                 if len(layer.data) > 0:
                     if point_type == "cell":
                         destination_layer = self.training_data_cell_layer
@@ -481,7 +477,6 @@ class CurationWidget(QWidget):
             self.output_directory = None
 
     def convert_layers_to_cells(self):
-
         self.cells_to_extract = convert_layer_to_cells(
             self.training_data_cell_layer.data
         )

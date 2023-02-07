@@ -4,7 +4,6 @@ from unittest.mock import patch
 import napari
 import numpy as np
 import pytest
-from matplotlib.style import available
 from napari.layers import Image, Points
 
 from cellfinder_napari import sample_data

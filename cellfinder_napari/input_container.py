@@ -1,6 +1,5 @@
 from abc import abstractmethod
 from dataclasses import asdict
-from pathlib import Path
 
 
 class InputContainer:

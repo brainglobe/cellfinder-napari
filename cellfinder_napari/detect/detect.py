@@ -1,6 +1,6 @@
 from math import ceil
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import napari
 from cellfinder_core.classify.cube_generator import get_cube_depth_min_max
@@ -11,7 +11,6 @@ from qtpy.QtWidgets import QScrollArea
 
 from cellfinder_napari.utils import (
     add_layers,
-    brainglobe_logo,
     header_label_widget,
     html_label_widget,
     widget_header,

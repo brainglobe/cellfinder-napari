@@ -1,9 +1,7 @@
-from abc import abstractmethod
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-import napari
 import numpy
 
 from cellfinder_napari.input_container import InputContainer
