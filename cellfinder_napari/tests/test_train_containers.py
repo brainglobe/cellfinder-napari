@@ -28,6 +28,5 @@ def test_core_args_passed(input_container):
     backend_signature = signature(run)
     expected_kwargs_set = set(backend_signature.parameters.keys())
     actual_kwargs_set = set(input_container.as_core_arguments().keys())
-    assert (
-        actual_kwargs_set <= expected_kwargs_set
-    )  # check all actual keywords are in expected (but not the other way around.)
+    # check all actual keywords are in expected (but not the other way around.)
+    assert actual_kwargs_set <= expected_kwargs_set

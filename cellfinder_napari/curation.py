@@ -238,7 +238,8 @@ class CurationWidget(QWidget):
 
     def set_training_data_non_cell(self):
         """
-        Set non-cell training data from current training data text box selection.
+        Set non-cell training data from current training data text box
+        selection.
         """
         if self.training_data_non_cell_choice.currentText() != "":
             self.training_data_non_cell_layer = self.viewer.layers[

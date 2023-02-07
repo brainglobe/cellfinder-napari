@@ -117,7 +117,8 @@ def detect_widget() -> FunctionGui:
         use_pre_trained_weights : bool
             Select to use pre-trained model weights
         trained_model : Optional[Path]
-            Trained model file path (home directory (default) -> pretrained weights)
+            Trained model file path (home directory (default) -> pretrained
+            weights)
         start_plane : int
             First plane to process (to process a subset of the data)
         end_plane : int
@@ -189,7 +190,8 @@ def detect_widget() -> FunctionGui:
             lambda points: add_layers(points, viewer=viewer)
         )
 
-        # Make sure if the worker emits an error, it is propagated to this thread
+        # Make sure if the worker emits an error, it is propagated to this
+        # thread
         def reraise(e):
             raise Exception from e
 
