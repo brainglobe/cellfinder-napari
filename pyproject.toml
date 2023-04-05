@@ -21,6 +21,8 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
     "brainglobe-napari-io",
+    "brainreg-napari",
+    "cellfinder>=0.4.0",
     "cellfinder-core>=0.3",
     "imlib",
     "magicgui",
