@@ -5,16 +5,18 @@ This example loads the data needed to run a transformation of detected cells
 from a source brain space to the registered brain space.
 
 The following layers are loaded:
-- A low resolution full brain image, taken from the ``brainreg-napari`` sample data.
-- The output from registering this data using ``brainreg-napari``. This data must
-  be present on the local filesystem at the path specified by the ``brainreg_output_folder``
-  below.
-- The detected cells in this data, saved as ``cells.xml`` in the same directory. For this
-  dataset all the detected cells are marked as non-cells, but this is sufficient to
-  demonstrate the transformation widget.
+- A low resolution full brain image,
+  taken from the ``brainreg-napari`` sample data.
+- The output from registering this data using ``brainreg-napari``.
+  This data must be present on the local filesystem at the path
+  specified by the ``brainreg_output_folder`` below.
+- The detected cells in this data, saved as ``cells.xml`` in the
+  same directory. For this dataset all the detected cells are
+  marked as non-cells, but this is sufficient to demonstrate
+  the transformation widget.
 
-When the napari viewer opens, click "Run" in the widget and a new layer called "Transformed cells"
-should appear in the viewer.
+When the napari viewer opens, click "Run" in the widget
+and a new layer called "Transformed cells" should appear in the viewer.
 """
 from pathlib import Path
 
