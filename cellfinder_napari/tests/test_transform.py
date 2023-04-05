@@ -6,7 +6,6 @@ from brainreg_napari.sample_data import load_test_brain
 from napari.layers import Layer, Points
 
 import cellfinder_napari.transform
-from cellfinder_napari.transform import transform
 
 BRAINREG_OUTPUT_DIRECTORY = (
     Path(__file__).parent / "data" / "brainreg-napari-output"
