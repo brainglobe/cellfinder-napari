@@ -2,17 +2,15 @@
 Widget to allow transformation of detected cells from the source space to a
 registered atlas space.
 """
-from glob import glob
 from pathlib import Path
 from typing import Optional
 
 import bg_space as bgs
-import napari
-from bg_atlasapi import BrainGlobeAtlas
 from cellfinder.analyse.analyse import transform_points_to_atlas_space
 from magicgui import magicgui
 from napari.layers import Image, Labels, Points
 from napari.utils.notifications import show_info
+from napari.viewer import current_viewer
 
 # An internal flag to allow the deformation field files to be
 # set in the tests, instead of being read in from a metadata file.
@@ -27,7 +25,7 @@ def transform(
     cells: Points,
     source_brain: Image,
     registered_brain: Labels,
-) -> Optional[Points]:
+) -> None:
     if any(arg is None for arg in [cells, source_brain, registered_brain]):
         show_info("At least one input not selected")
         return None
@@ -82,7 +80,7 @@ def transform(
     cell_properties["face_color"] = "red"
     cell_properties["name"] = "Transformed cells"
 
-    return Points(transformed_cells, **cell_properties)
+    current_viewer().add_layer(Points(transformed_cells, **cell_properties))
 
 
 def get_transform_widget():
