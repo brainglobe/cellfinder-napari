@@ -90,4 +90,3 @@ If you find this plugin useful, and use it in your research, please cite the pap
 **If you use this, or any other tools in the brainglobe suite, please
  [let us know](mailto:code@adamltyson.com?subject=cellfinder-napari), and
  we'd be happy to promote your paper/talk etc.**
-
