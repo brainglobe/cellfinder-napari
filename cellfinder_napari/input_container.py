@@ -1,8 +1,10 @@
+import dataclasses
 from abc import abstractmethod
 from dataclasses import asdict
 from typing import Optional
 
 
+@dataclasses.dataclass
 class InputContainer:
     """Base for classes that contain inputs
 
