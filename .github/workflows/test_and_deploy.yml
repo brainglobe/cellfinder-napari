@@ -49,6 +49,8 @@ jobs:
           python-version: "3.10"
 
     steps:
+      # Setup pyqt libraries
+      - uses: tlambert03/setup-qt-libs@v1
       # Setup VTK with headless display
       - uses: pyvista/setup-headless-display-action@v2
       # Run tests
