@@ -1,3 +1,12 @@
+# This package has moved
+
+`cellfinder-napari` has merged with it's backend code and is now available as a [single package called `cellfinder`](https://github.com/brainglobe/cellfinder).
+We recommend you uninstall `cellfinder-napari` and instead use the functionality provided in the `cellfinder` package.
+
+These changes are part of our [wider restructuring](https://brainglobe.info/blog/version1/version_1_announcement.html) of the BrainGlobe suite of tools and analysis pipelines, which you can [keep up to date with on our blog](https://brainglobe.info/blog/index.html).
+
+---
+
 # cellfinder-napari
 
 [![License](https://img.shields.io/pypi/l/cellfinder-napari.svg?color=green)](https://github.com/napari/cellfinder-napari/raw/master/LICENSE)
